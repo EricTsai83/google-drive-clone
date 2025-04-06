@@ -1,29 +1,43 @@
-# Create T3 App
+# Google Drive Clone
 
-This is a [T3 Stack](https://create.t3.gg/) project bootstrapped with `create-t3-app`.
+## TODO
 
-## What's next? How do I make an app with this?
+#### Theo taught me. [Reference](https://www.youtube.com/watch?v=c-hKSbzooAg)
 
-We try to keep this project as simple as possible, so you can start with just the scaffolding we set up for you, and add additional things later when they become necessary.
+- [x] Set up the database and data model
+- [x] Move the folder open state to the URL
+- [x] Add authentication
+- [x] Add file uploading
+- [x] Add analytics
+- [x] Make sure sort order is consistent
+- [x] Implement file deletions
+- [x] Create a real homepage and onboarding process
 
-If you are not familiar with the different technologies used in this project, please refer to the respective docs. If you still are in the wind, please join our [Discord](https://t3.gg/discord) and ask for help.
+---
 
-- [Next.js](https://nextjs.org)
-- [NextAuth.js](https://next-auth.js.org)
-- [Prisma](https://prisma.io)
-- [Drizzle](https://orm.drizzle.team)
-- [Tailwind CSS](https://tailwindcss.com)
-- [tRPC](https://trpc.io)
+#### I learned on my own.
 
-## Learn More
+- [x] Nested folder deletions
+- [x] Add last modified time
+- [x] Folder creations
+- [x] Rename folders and files
+- [x] Access control: Verify that the user is the owner before displaying the folder page
+- [x] Create a "File View" page (focused on displaying images)
+- [x] Add a delete button and a description card on the "File View" page.
+- [x] Gray out a row while it's being deleted
+- [x] Disable file clicks for opening the file view page, except for images.
+- [x] Ensure that when a user changes the file extension, our application displays a "can't view" message.
+- [x] Ensure that even if the image upload has not completed, we can leave the page, return later, and display a toast notification.
+- [x] Implement the dropzone
+- [x] Convert file sizes into a readable format
+- [x] Redesign the theme
+- [x] Prettify the upload toast
+- [x] Enhance the responsiveness of the call-to-action button by using useFormStatus with a server action
+- [] Add infinite scroll
+- [ ] Implement all authentication stuff, including the per-user upload limit
 
-To learn more about the [T3 Stack](https://create.t3.gg/), take a look at the following resources:
+## Fun follow ups
 
-- [Documentation](https://create.t3.gg/)
-- [Learn the T3 Stack](https://create.t3.gg/en/faq#what-learning-resources-are-currently-available) — Check out these awesome tutorials
+### Refactor the async code using the tryCatch utility function
 
-You can check out the [create-t3-app GitHub repository](https://github.com/t3-oss/create-t3-app) — your feedback and contributions are welcome!
-
-## How do I deploy this?
-
-Follow our deployment guides for [Vercel](https://create.t3.gg/en/deployment/vercel), [Netlify](https://create.t3.gg/en/deployment/netlify) and [Docker](https://create.t3.gg/en/deployment/docker) for more information.
+### Improve the error handling stuff
