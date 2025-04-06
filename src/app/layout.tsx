@@ -4,6 +4,10 @@ import { type Metadata } from "next";
 import { Geist } from "next/font/google";
 
 import { TRPCReactProvider } from "@/trpc/react";
+import { ClerkProvider } from "@clerk/nextjs";
+import { PostHogProvider } from "./_providers/posthog-provider";
+import { Toaster } from "@/components/ui/sonner";
+import { ThemeProvider } from "@/app/_providers/theme-provider";
 
 export const metadata: Metadata = {
   title: "Create T3 App",
@@ -20,10 +24,20 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" className={`${geist.variable}`}>
-      <body>
-        <TRPCReactProvider>{children}</TRPCReactProvider>
-      </body>
-    </html>
+    <ClerkProvider>
+      <html lang="en" className={`${geist.variable}`} suppressHydrationWarning>
+        <body>
+          <PostHogProvider>
+            <ThemeProvider attribute="class" defaultTheme="system">
+              <TRPCReactProvider>
+                <main>{children}</main>
+              </TRPCReactProvider>
+              <div id="modal-root" />
+              <Toaster richColors icons={{ loading: <></> }} />
+            </ThemeProvider>
+          </PostHogProvider>
+        </body>
+      </html>
+    </ClerkProvider>
   );
 }
