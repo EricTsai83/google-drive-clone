@@ -8,9 +8,14 @@ import { FileUploadDropzoneDialog } from "./_components/file-upload-dropzone-dia
 import ModeToggle from "@/components/mode-toggle";
 import { Footer } from "@/components/footer";
 
-type DriveContentsProps = {
-  files: (typeof files_table.$inferSelect)[];
+type TableBodyProps = {
   folders: (typeof folders_table.$inferSelect)[];
+  files: (typeof files_table.$inferSelect)[];
+};
+
+type DriveContentsProps = {
+  files: TableBodyProps["files"];
+  folders: TableBodyProps["folders"];
   parents: (typeof folders_table.$inferSelect)[];
   currentFolderId: number;
 };
@@ -41,14 +46,7 @@ export default function DriveContents({
           <div className="bg-primary border-b px-6 py-4">
             <TableHeader />
           </div>
-          <ul className="bg-popover max-h-[80vh] overflow-y-auto">
-            {folders.map((folder) => (
-              <ItemRow key={folder.id} item={folder} type="folder" />
-            ))}
-            {files.map((file) => (
-              <ItemRow key={file.id} item={file} type="file" />
-            ))}
-          </ul>
+          <TableBody files={files} folders={folders} />
         </div>
       </div>
       <Footer />
@@ -99,5 +97,18 @@ function TableHeader() {
       <div className="col-span-3">Size</div>
       <div className="col-span-1"></div>
     </div>
+  );
+}
+
+function TableBody({ folders, files }: TableBodyProps) {
+  return (
+    <ul className="bg-popover max-h-[80vh] overflow-y-auto">
+      {folders.map((folder) => (
+        <ItemRow key={folder.id} item={folder} type="folder" />
+      ))}
+      {files.map((file) => (
+        <ItemRow key={file.id} item={file} type="file" />
+      ))}
+    </ul>
   );
 }
