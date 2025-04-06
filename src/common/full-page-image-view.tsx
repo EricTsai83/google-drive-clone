@@ -56,7 +56,7 @@ export function FullPageImageView({
         <div>Invalid image format</div>
       )}
 
-      <div className="absolute bottom-10 right-10 z-10">
+      <div className="absolute right-10 bottom-10 z-10">
         <ImageDescriptionCard
           ownerId={image.ownerId}
           createdAt={image.createdAt.toLocaleDateString()}
@@ -67,7 +67,7 @@ export function FullPageImageView({
         variant="destructive"
         size="icon"
         onClick={handleDelete}
-        className="absolute right-4 top-4 z-10"
+        className="absolute top-4 right-4 z-10 cursor-pointer"
       >
         <Trash2 className="h-4 w-4" />
       </Button>
