@@ -4,6 +4,7 @@ import { TextEffect } from "@/components/ui/text-effect";
 import { AnimatedGroup } from "@/components/motion/animated-group";
 import { LogoCloud } from "@/components/logo-cloud";
 import { GetStartedButton } from "@/components/get-started-button";
+import { Footer } from "@/components/footer";
 
 const transitionVariants = {
   item: {
@@ -96,9 +97,7 @@ export default function HomePage() {
         </div>
       </main>
 
-      <footer className="mt-16 text-sm text-neutral-500">
-        © {new Date().getFullYear()} Eric Tsai. All rights reserved.
-      </footer>
+      <Footer />
     </>
   );
 }

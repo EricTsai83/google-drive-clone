@@ -6,6 +6,7 @@ import { SignedIn, SignedOut, SignInButton, UserButton } from "@clerk/nextjs";
 import { CreateFolderDialog } from "@/app/f/[folderId]/_components/create-folder-dialog";
 import { FileUploadDropzoneDialog } from "./_components/file-upload-dropzone-dialog";
 import ModeToggle from "@/components/mode-toggle";
+import { Footer } from "@/components/footer";
 
 type DriveContentsProps = {
   files: (typeof files_table.$inferSelect)[];
@@ -36,11 +37,11 @@ export default function DriveContents({
           <FileUploadDropzoneDialog currentFolderId={currentFolderId} />
         </div>
 
-        <div className="rounded-lg bg-gray-800 shadow-xl">
-          <div className="border-b bg-primary px-6 py-4">
+        <div className="rounded-lg shadow-xl">
+          <div className="bg-primary border-b px-6 py-4">
             <TableHeader />
           </div>
-          <ul className="bg-popover">
+          <ul className="bg-popover max-h-[80vh] overflow-y-auto">
             {folders.map((folder) => (
               <ItemRow key={folder.id} item={folder} type="folder" />
             ))}
@@ -50,6 +51,7 @@ export default function DriveContents({
           </ul>
         </div>
       </div>
+      <Footer />
     </div>
   );
 }
