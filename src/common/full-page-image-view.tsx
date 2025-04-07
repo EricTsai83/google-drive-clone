@@ -7,6 +7,7 @@ import { Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { deleteFile } from "@/server/actions";
 import { useRouter } from "next/navigation";
+import { format } from "date-fns";
 
 export const validImageExtensions = [
   ".jpg",
@@ -59,7 +60,7 @@ export function FullPageImageView({
       <div className="absolute right-10 bottom-10 z-10">
         <ImageDescriptionCard
           ownerId={image.ownerId}
-          createdAt={image.createdAt.toLocaleDateString()}
+          createdAt={format(new Date(image.createdAt), "yyyy-MM-dd")}
         />
       </div>
 

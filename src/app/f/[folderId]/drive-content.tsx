@@ -27,26 +27,31 @@ export default function DriveContents({
   currentFolderId,
 }: DriveContentsProps) {
   return (
-    <div className="min-h-screen p-8">
-      <div className="mx-auto max-w-6xl">
-        <header className="mb-6 flex items-center justify-between">
-          <BreadcrumbNav parents={parents} />
-          <div className="flex items-center gap-6">
-            <AuthButtons />
-            <ModeToggle />
-          </div>
-        </header>
+    // 使用 h-screen 確保有明確的視窗高度
+    <div className="flex h-screen flex-col">
+      {/* 主要內容區域使用 padding 並限制溢出 */}
+      <div className="flex-1 overflow-hidden p-8">
+        <div className="mx-auto flex h-full max-w-6xl flex-col">
+          <header className="flex items-center justify-between">
+            <BreadcrumbNav parents={parents} />
+            <div className="flex items-center gap-6">
+              <AuthButtons />
+              <ModeToggle />
+            </div>
+          </header>
 
-        <div className="mb-4 flex justify-between">
-          <CreateFolderDialog currentFolderId={currentFolderId} />
-          <FileUploadDropzoneDialog currentFolderId={currentFolderId} />
-        </div>
-
-        <div className="rounded-lg shadow-xl">
-          <div className="bg-primary border-b px-6 py-4">
-            <TableHeader />
+          <div className="mt-6 mb-4 flex justify-between">
+            <CreateFolderDialog currentFolderId={currentFolderId} />
+            <FileUploadDropzoneDialog currentFolderId={currentFolderId} />
           </div>
-          <TableBody files={files} folders={folders} />
+
+          {/* 表格容器使用剩餘空間 */}
+          <div className="flex flex-1 flex-col overflow-hidden rounded-lg shadow-xl">
+            <div className="bg-primary flex-shrink-0 border-b px-6 py-4">
+              <TableHeader />
+            </div>
+            <TableBody files={files} folders={folders} />
+          </div>
         </div>
       </div>
       <Footer />
@@ -100,9 +105,28 @@ function TableHeader() {
   );
 }
 
+// function TableBody({ folders, files }: TableBodyProps) {
+//   return (
+//     <ul className="bg-popover flex-1 overflow-y-auto">
+//       <div className="h-20 border-b"></div>
+//       <div className="h-20 border-b"></div>
+//       <div className="h-20 border-b"></div>
+//       <div className="h-20 border-b"></div>
+//       <div className="h-20 border-b"></div>
+//       <div className="h-20 border-b"></div>
+//       <div className="h-20 border-b"></div>
+//       <div className="h-20 border-b"></div>
+//       <div className="h-20 border-b"></div>
+//       <div className="h-20 border-b"></div>
+//       <div className="h-20 border-b"></div>
+//       <div className="h-20 border-b"></div>
+//     </ul>
+//   );
+// }
+
 function TableBody({ folders, files }: TableBodyProps) {
   return (
-    <ul className="bg-popover max-h-[80vh] overflow-y-auto">
+    <ul className="bg-popover flex h-full flex-col overflow-y-auto">
       {folders.map((folder) => (
         <ItemRow key={folder.id} item={folder} type="folder" />
       ))}
