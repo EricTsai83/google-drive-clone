@@ -4,7 +4,7 @@ export function Footer({ className }: { className?: string }) {
   return (
     <footer
       className={cn(
-        "mt-16 w-full text-center text-sm text-neutral-500",
+        "mt-12 mb-8 w-full text-center text-sm text-neutral-500",
         className,
       )}
     >

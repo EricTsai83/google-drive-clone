@@ -71,7 +71,7 @@ export default function ModeToggle() {
     <div
       className="flex h-7 w-7 cursor-pointer items-center justify-center"
       onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-      aria-label={`Switch to ${theme === "dark" ? "light" : "dark"} mode`}
+      // aria-label={`Switch to ${theme === "dark" ? "light" : "dark"} mode`}
     >
       <m.svg
         strokeWidth="4"
@@ -136,7 +136,6 @@ export default function ModeToggle() {
           }}
         />
       </m.svg>
-      {/* </Button> */}
     </div>
   );
 }
