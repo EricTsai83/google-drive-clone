@@ -3,8 +3,10 @@ import DriveContents from "./drive-content";
 import { QUERIES } from "@/server/db/queries";
 import { auth } from "@clerk/nextjs/server";
 import { unauthorized } from "next/navigation";
+import { BreadcrumbNav, AuthButtons } from "./header";
+import { ModeToggleButton } from "@/components/mode-toggle";
 
-export default async function GoogleDriveClone(props: {
+export default async function DrivePage(props: {
   params: Promise<{ folderId: string }>;
 }) {
   const params = await props.params;
@@ -38,10 +40,22 @@ export default async function GoogleDriveClone(props: {
   }
 
   return (
-    <DriveContents
-      parents={parents}
-      currentFolderId={parsedFolderId}
-      currentFolderOwnerId={currentFolderOwnerId}
-    />
+    <div className="flex h-screen flex-col">
+      <div className="flex-1 overflow-hidden p-8">
+        <div className="mx-auto flex h-full max-w-6xl flex-col">
+          <header className="flex items-center justify-between">
+            <BreadcrumbNav parents={parents} />
+            <div className="flex items-center gap-6">
+              <AuthButtons />
+              <ModeToggleButton />
+            </div>
+          </header>
+          <DriveContents
+            currentFolderId={parsedFolderId}
+            currentFolderOwnerId={currentFolderOwnerId}
+          />
+        </div>
+      </div>
+    </div>
   );
 }

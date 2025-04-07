@@ -1,11 +1,9 @@
 import { Loader } from "lucide-react";
 
-export default function Loading() {
+export default async function Loading() {
   return (
-    <div className="flex h-screen items-center justify-center">
-      <div className="h-12 w-12 animate-spin">
-        <Loader className="h-full w-full text-primary" />
-      </div>
+    <div className="flex animate-spin items-center justify-center">
+      <Loader className="text-primary h-12 w-12" />
     </div>
   );
 }

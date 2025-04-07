@@ -31,7 +31,7 @@ export default function RootLayout({
           <TRPCReactProvider>
             <PostHogProvider>
               <ThemeProvider attribute="class" defaultTheme="system">
-                <main>{children}</main>
+                {children}
                 {modal}
                 <div id="modal-root" />
                 <Toaster richColors icons={{ loading: <></> }} />

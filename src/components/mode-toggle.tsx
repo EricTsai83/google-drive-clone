@@ -2,8 +2,10 @@
 
 import { useTheme } from "next-themes";
 import { motion as m } from "motion/react";
+import { Moon, Sun } from "lucide-react";
+import { cn } from "@/lib/utils";
 
-export default function ModeToggle() {
+export function ModeToggle() {
   const { setTheme, theme } = useTheme();
 
   const raysVariants = {
@@ -76,8 +78,8 @@ export default function ModeToggle() {
       <m.svg
         strokeWidth="4"
         strokeLinecap="round"
-        width={100}
-        height={100}
+        width={28}
+        height={28}
         viewBox="0 0 100 100"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
@@ -136,6 +138,37 @@ export default function ModeToggle() {
           }}
         />
       </m.svg>
+    </div>
+  );
+}
+
+export function ModeToggleButton() {
+  const { setTheme, theme } = useTheme();
+  const isDark = theme === "dark";
+
+  return (
+    <div
+      role="button"
+      className="relative flex h-7 w-7 cursor-pointer items-center justify-center overflow-hidden rounded-full bg-gradient-to-br from-violet-500 to-indigo-600 shadow-sm transition-all duration-300 hover:from-violet-600 hover:to-indigo-700 hover:shadow-md dark:from-violet-700 dark:to-indigo-700"
+      onClick={() => setTheme(isDark ? "light" : "dark")}
+    >
+      <Sun
+        className={cn(
+          "absolute h-5 w-5 stroke-2 text-white transition-all duration-300",
+          isDark
+            ? "scale-100 rotate-0 opacity-100"
+            : "scale-0 rotate-[180deg] opacity-0",
+        )}
+      />
+      <Moon
+        className={cn(
+          "absolute h-5 w-5 stroke-2 text-white transition-all duration-300",
+          isDark
+            ? "scale-0 rotate-180 opacity-0"
+            : "scale-100 rotate-0 opacity-100",
+        )}
+      />
+      <span className="sr-only">Toggle theme</span>
     </div>
   );
 }

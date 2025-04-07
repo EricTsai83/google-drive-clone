@@ -33,11 +33,9 @@
 - [x] Redesign the theme
 - [x] Prettify the upload toast
 - [x] Enhance the responsiveness of the call-to-action button by using useFormStatus with a server action
+- [x] Improve the UX by optimizing data fetching strategies
+- [x] Create a theme mode toggle component
 - [ ] Add infinite scroll
 - [ ] Implement all authentication stuff, including the per-user upload limit
-
-## Fun follow ups
-
-### Refactor the async code using the tryCatch utility function
-
-### Improve the error handling stuff
+- [ ] Refactor the async code using the tryCatch utility function
+- [ ] Improve the error handling stuff
