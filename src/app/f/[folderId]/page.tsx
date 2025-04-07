@@ -18,6 +18,7 @@ export default async function GoogleDriveClone(props: {
 
   const parsedFolderId = data.folderId;
 
+  // 取得該資料夾的 ownerId
   const currentFolderOwnerId = await QUERIES.getFolderOwner(parsedFolderId);
   const session = await auth();
 
@@ -25,33 +26,22 @@ export default async function GoogleDriveClone(props: {
     unauthorized();
   }
 
-  const [folders, files, parents] = await Promise.all([
-    QUERIES.getFolders(parsedFolderId),
-    QUERIES.getFiles(parsedFolderId),
-    QUERIES.getAllParentsForFolder(parsedFolderId),
-  ]);
+  // 取得上層資料夾
+  const parents = await QUERIES.getAllParentsForFolder(parsedFolderId);
 
-  // Check ownership of all items
-  const hasInvalidFolder = folders.some(
-    (folder) => folder.ownerId !== currentFolderOwnerId,
-  );
-  const hasInvalidFile = files.some(
-    (file) => file.ownerId !== currentFolderOwnerId,
-  );
+  // 驗證所有上層父資料夾的 owner 是否正確
   const hasInvalidParent = parents.some(
     (parent) => parent.ownerId !== currentFolderOwnerId,
   );
-
-  if (hasInvalidFolder || hasInvalidFile || hasInvalidParent) {
+  if (hasInvalidParent) {
     unauthorized();
   }
 
   return (
     <DriveContents
-      folders={folders}
-      files={files}
       parents={parents}
       currentFolderId={parsedFolderId}
+      currentFolderOwnerId={currentFolderOwnerId}
     />
   );
 }

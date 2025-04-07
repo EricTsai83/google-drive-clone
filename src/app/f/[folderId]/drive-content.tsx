@@ -1,14 +1,12 @@
 import { Suspense } from "react";
 import { ChevronRight } from "lucide-react";
-import { ItemRow } from "./_components/item-row";
-import type { files_table, folders_table } from "@/server/db/schema";
+import type { folders_table } from "@/server/db/schema";
 import Link from "next/link";
 import { SignedIn, SignedOut, SignInButton, UserButton } from "@clerk/nextjs";
 import { CreateFolderDialog } from "@/app/f/[folderId]/_components/create-folder-dialog";
 import { FileUploadDropzoneDialog } from "./_components/file-upload-dropzone-dialog";
 import ModeToggle from "@/components/mode-toggle";
 import { Footer } from "@/components/footer";
-
 // Skeleton components
 import { BreadcrumbNavSkeleton } from "./_components/skeletons/breadcrumb-nav-skeleton";
 import { AuthButtonsSkeleton } from "./_components/skeletons/auth-buttons-skeleton";
@@ -17,24 +15,18 @@ import { FileUploadDropzoneDialogSkeleton } from "./_components/skeletons/file-u
 import { TableHeaderSkeleton } from "./_components/skeletons/table-header-skeleton";
 import { ItemRowSkeletonList } from "./_components/skeletons/item-row-skeleton";
 import ModeToggleSkeleton from "@/components/skeletons/mode-toggle-skeleton";
-
-type TableBodyProps = {
-  folders: (typeof folders_table.$inferSelect)[];
-  files: (typeof files_table.$inferSelect)[];
-};
+import TableBody from "./_components/table-body";
 
 type DriveContentsProps = {
-  files: TableBodyProps["files"];
-  folders: TableBodyProps["folders"];
   parents: (typeof folders_table.$inferSelect)[];
   currentFolderId: number;
+  currentFolderOwnerId: string;
 };
 
 export default function DriveContents({
-  files,
-  folders,
   parents,
   currentFolderId,
+  currentFolderOwnerId,
 }: DriveContentsProps) {
   return (
     <div className="flex h-screen flex-col">
@@ -70,7 +62,10 @@ export default function DriveContents({
               </Suspense>
             </div>
             <Suspense fallback={<ItemRowSkeletonList count={6} />}>
-              <TableBody files={files} folders={folders} />
+              <TableBody
+                folderId={currentFolderId}
+                currentFolderOwnerId={currentFolderOwnerId}
+              />
             </Suspense>
           </div>
         </div>
@@ -125,18 +120,5 @@ function TableHeader() {
       <div className="col-span-3">Size</div>
       <div className="col-span-1"></div>
     </div>
-  );
-}
-
-function TableBody({ folders, files }: TableBodyProps) {
-  return (
-    <ul className="bg-popover flex h-full flex-col overflow-y-auto">
-      {folders.map((folder) => (
-        <ItemRow key={folder.id} item={folder} type="folder" />
-      ))}
-      {files.map((file) => (
-        <ItemRow key={file.id} item={file} type="file" />
-      ))}
-    </ul>
   );
 }
