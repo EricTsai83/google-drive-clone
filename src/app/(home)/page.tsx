@@ -82,10 +82,6 @@ export default function HomePage() {
                   className="mx-auto max-w-sm"
                 >
                   <div className="shadow shadow-zinc-950/5">
-                    {/* <Button className="w-full" size="lg" type="submit">
-                      Get Started
-                    </Button> */}
-
                     <GetStartedButton />
                   </div>
                 </form>
