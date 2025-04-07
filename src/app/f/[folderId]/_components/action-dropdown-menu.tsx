@@ -10,7 +10,6 @@ import { deleteFile, deleteFolder } from "@/server/actions";
 import { MoreHorizontal, Trash2Icon } from "lucide-react";
 import { toast } from "sonner";
 import { RenameDialog } from "@/app/f/[folderId]/_components/rename-dialog";
-import { Button } from "@/components/ui/button";
 
 export type ActionDropdownMenuProps = {
   id: number;
