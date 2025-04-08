@@ -34,19 +34,19 @@ export default async function DrivePage(props: {
       <div className="flex-1 overflow-hidden p-8">
         <div className="mx-auto flex h-full max-w-6xl flex-col">
           <header className="flex items-center justify-between">
-            {/* <BreadcrumbNav
+            <BreadcrumbNav
               folderId={parsedFolderId}
               currentFolderOwnerId={currentFolderOwnerId}
             />
             <div className="flex items-center gap-6">
               <AuthButtons />
               <ModeToggleButton />
-            </div> */}
+            </div>
           </header>
-          <DriveContents
+          {/* <DriveContents
             currentFolderId={parsedFolderId}
             currentFolderOwnerId={currentFolderOwnerId}
-          />
+          /> */}
         </div>
       </div>
     </div>
