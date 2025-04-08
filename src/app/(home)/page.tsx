@@ -5,7 +5,8 @@ import { AnimatedGroup } from "@/components/motion/animated-group";
 import { LogoCloud } from "@/components/logo-cloud";
 import { GetStartedButton } from "@/components/get-started-button";
 import { Footer } from "@/components/footer";
-import { ModeToggle } from "@/components/mode-toggle";
+// import { ModeToggle } from "@/components/mode-toggle";
+import ModeToggle from "@/components/client-mode-toggle";
 
 const transitionVariants = {
   item: {
@@ -95,7 +96,7 @@ export default function HomePage() {
       </main>
 
       <Footer />
-      <div className="absolute right-6 bottom-6 z-10">
+      <div className="fixed right-6 bottom-6 z-10">
         <ModeToggle />
       </div>
     </>

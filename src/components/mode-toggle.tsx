@@ -5,7 +5,7 @@ import { motion as m } from "motion/react";
 import { Moon, Sun } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-export function ModeToggle() {
+export function ModeToggleSvgAnimation() {
   const { setTheme, theme } = useTheme();
 
   const raysVariants = {
