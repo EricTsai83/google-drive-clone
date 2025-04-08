@@ -9,11 +9,9 @@ export function BreadcrumbNavSkeleton() {
         My Drive
       </Link>
 
-      {/* Generate 2-3 folder skeletons */}
-
       <div className="flex items-center">
-        <ChevronRight className="mx-2 text-muted-foreground" size={16} />
-        <div className="h-4 w-9 animate-pulse rounded bg-muted" />
+        <ChevronRight className="text-muted-foreground mx-2" size={16} />
+        <div className="bg-muted h-4 w-9 animate-pulse rounded" />
       </div>
     </div>
   );

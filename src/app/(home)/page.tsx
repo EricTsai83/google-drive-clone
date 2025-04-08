@@ -5,7 +5,6 @@ import { AnimatedGroup } from "@/components/motion/animated-group";
 import { LogoCloud } from "@/components/logo-cloud";
 import { GetStartedButton } from "@/components/get-started-button";
 import { Footer } from "@/components/footer";
-// import { ModeToggle } from "@/components/mode-toggle";
 import ModeToggle from "@/components/client-mode-toggle";
 
 const transitionVariants = {
