@@ -1,9 +1,9 @@
 import { z } from "zod";
-import DriveContents from "./drive-content";
+// import DriveContents from "./drive-content";
 import { QUERIES } from "@/server/db/queries";
 import { auth } from "@clerk/nextjs/server";
 import { unauthorized } from "next/navigation";
-import { AuthButtons } from "./auth-buttons";
+// import { AuthButtons } from "./auth-buttons";
 import { BreadcrumbNav } from "./breadcrumb-nav";
 import { ModeToggleButton } from "@/components/client-mode-toggle";
 
@@ -39,7 +39,7 @@ export default async function DrivePage(props: {
               currentFolderOwnerId={currentFolderOwnerId}
             />
             <div className="flex items-center gap-6">
-              <AuthButtons />
+              {/* <AuthButtons /> */}
               <ModeToggleButton />
             </div>
           </header>
