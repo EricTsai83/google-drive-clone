@@ -6,6 +6,7 @@ import {
   folders_table as foldersSchema,
 } from "@/server/db/schema";
 import { eq, isNull, and } from "drizzle-orm/expressions";
+import { sql } from "drizzle-orm";
 
 export const QUERIES = {
   getFolderOwner: async function (folderId: number) {
@@ -37,21 +38,44 @@ export const QUERIES = {
       .orderBy(filesSchema.id);
   },
   getAllParentsForFolder: async function (folderId: number) {
-    const parents = [];
-    let currentId: number | null = folderId;
-    while (currentId !== null) {
-      const folder = await db
-        .selectDistinct()
-        .from(foldersSchema)
-        .where(eq(foldersSchema.id, currentId));
+    const parents = await db.execute<{
+      id: number;
+      ownerId: string;
+      name: string;
+      parent: number | null;
+      createdAt: Date;
+      lastModified: Date;
+    }>(
+      sql`
+        WITH RECURSIVE folder_hierarchy AS (
+          -- Base case: start with the given folder
+          SELECT id, owner_id, name, parent, created_at, last_modified
+          FROM "google-drive_folders_table"
+          WHERE id = ${folderId}
+          
+          UNION ALL
+          
+          -- Recursive case: join with parent folders
+          SELECT f.id, f.owner_id, f.name, f.parent, f.created_at, f.last_modified
+          FROM "google-drive_folders_table" f
+          INNER JOIN folder_hierarchy h ON f.id = h.parent
+        )
+        SELECT 
+          id,
+          owner_id as "ownerId",
+          name,
+          parent,
+          created_at as "createdAt",
+          last_modified as "lastModified"
+        FROM folder_hierarchy
+        ORDER BY created_at;
+      `,
+    );
 
-      if (!folder[0]) {
-        throw new Error("parent folder not found");
-      }
-
-      parents.unshift(folder[0]);
-      currentId = folder[0]?.parent;
+    if (parents.length === 0) {
+      throw new Error("folder not found");
     }
+
     return parents;
   },
   getFolderById: async function (folderId: number) {
@@ -76,6 +100,43 @@ export const QUERIES = {
       .from(filesSchema)
       .where(eq(filesSchema.id, fileId));
     return file[0];
+  },
+  getFolderContents: async function (folderId: number) {
+    const contents = await db
+      .select({
+        type: sql<"folder" | "file">`'folder'::text`.as("type"),
+        id: foldersSchema.id,
+        name: foldersSchema.name,
+        createdAt: foldersSchema.createdAt,
+        lastModified: foldersSchema.lastModified,
+        ownerId: foldersSchema.ownerId,
+        parent: foldersSchema.parent,
+        // 為檔案特有的欄位提供 NULL 值
+        size: sql`NULL`.as("size"),
+        url: sql`NULL`.as("url"),
+        utFileKey: sql`NULL`.as("utFileKey"),
+      })
+      .from(foldersSchema)
+      .where(eq(foldersSchema.parent, folderId))
+      .union(
+        db
+          .select({
+            type: sql<"folder" | "file">`'file'::text`.as("type"),
+            id: filesSchema.id,
+            name: filesSchema.name,
+            createdAt: filesSchema.createdAt,
+            lastModified: filesSchema.lastModified,
+            ownerId: filesSchema.ownerId,
+            parent: filesSchema.parent,
+            size: filesSchema.size,
+            url: filesSchema.url,
+            utFileKey: filesSchema.utFileKey,
+          })
+          .from(filesSchema)
+          .where(eq(filesSchema.parent, folderId)),
+      )
+      .orderBy(sql`type DESC`, sql`name ASC`);
+    return contents;
   },
 };
 

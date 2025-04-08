@@ -5,7 +5,7 @@ import { auth } from "@clerk/nextjs/server";
 import { unauthorized } from "next/navigation";
 import { AuthButtons } from "./auth-buttons";
 import { BreadcrumbNav } from "./breadcrumb-nav";
-import { ModeToggleButton } from "@/components/mode-toggle";
+import { ModeToggleButton } from "@/components/client-mode-toggle";
 
 export default async function DrivePage(props: {
   params: Promise<{ folderId: string }>;

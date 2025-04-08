@@ -2,7 +2,7 @@
 
 import dynamic from "next/dynamic";
 
-const ModeToggle = dynamic(
+export const ModeToggleSvgAnimation = dynamic(
   () =>
     import("@/components/mode-toggle").then(
       (mod) => mod.ModeToggleSvgAnimation,
@@ -10,4 +10,7 @@ const ModeToggle = dynamic(
   { ssr: false },
 );
 
-export default ModeToggle;
+export const ModeToggleButton = dynamic(
+  () => import("@/components/mode-toggle").then((mod) => mod.ModeToggleButton),
+  { ssr: false },
+);
