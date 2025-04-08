@@ -39,3 +39,4 @@
 - [ ] Implement all authentication stuff, including the per-user upload limit
 - [ ] Refactor the async code using the tryCatch utility function
 - [ ] Improve the error handling stuff
+- [ ] Implement mobile layout
