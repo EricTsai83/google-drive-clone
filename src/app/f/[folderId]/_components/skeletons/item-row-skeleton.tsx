@@ -28,7 +28,7 @@ export function ItemRowSkeleton() {
 }
 
 // 如果需要多行 skeleton，可以使用這個組件
-export function ItemRowSkeletonList({ count = 5 }: { count?: number }) {
+export function ItemRowSkeletonList({ count = 9 }: { count?: number }) {
   return (
     <ul className="bg-popover flex h-full flex-col overflow-y-auto">
       {Array.from({ length: count }).map((_, index) => (

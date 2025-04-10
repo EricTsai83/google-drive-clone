@@ -5,6 +5,7 @@ import { Footer } from "@/components/footer";
 import TableBody from "./_components/table-body";
 // Skeleton components
 import { ItemRowSkeletonList } from "./_components/skeletons/item-row-skeleton";
+import { TableHeader } from "./_components/table-header";
 
 type DriveContentsProps = {
   currentFolderId: number;
@@ -27,7 +28,7 @@ export default function DriveContents({
         <div className="bg-primary flex-shrink-0 border-b px-6 py-4">
           <TableHeader />
         </div>
-        <Suspense fallback={<ItemRowSkeletonList count={9} />}>
+        <Suspense fallback={<ItemRowSkeletonList />}>
           <TableBody
             folderId={currentFolderId}
             currentFolderOwnerId={currentFolderOwnerId}
@@ -37,16 +38,5 @@ export default function DriveContents({
 
       <Footer />
     </>
-  );
-}
-
-function TableHeader() {
-  return (
-    <div className="grid grid-cols-12 gap-4 text-sm font-medium">
-      <div className="col-span-6">Name</div>
-      <div className="col-span-2">Last Modified</div>
-      <div className="col-span-3">Size</div>
-      <div className="col-span-1"></div>
-    </div>
   );
 }

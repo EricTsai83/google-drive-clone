@@ -9,7 +9,7 @@ import { ModeToggleButton } from "@/components/client-mode-toggle";
 import { BreadcrumbNavSkeleton } from "./_components/skeletons/breadcrumb-nav-skeleton";
 import { Suspense } from "react";
 
-export default async function DrivePage(props: {
+export default async function ForderPage(props: {
   params: Promise<{ folderId: string }>;
 }) {
   const params = await props.params;
