@@ -1,9 +1,9 @@
 import { BreadcrumbNavSkeleton } from "./_components/skeletons/breadcrumb-nav-skeleton";
-import { AuthButtonsSkeleton } from "./_components/skeletons/auth-buttons-skeleton";
+import { AuthButtons } from "./auth-buttons";
 import { CreateFolderDialogSkeleton } from "./_components/skeletons/create-folder-dialog-skeleton";
 import { FileUploadDropzoneDialogSkeleton } from "./_components/skeletons/file-upload-dropzone-dialog-skeleton";
 import { ItemRowSkeletonList } from "./_components/skeletons/item-row-skeleton";
-import ModeToggleSkeleton from "@/components/skeletons/mode-toggle-skeleton";
+import { ModeToggleButton } from "@/components/client-mode-toggle";
 import { TableHeader } from "./_components/table-header";
 
 export default function Loading() {
@@ -14,8 +14,8 @@ export default function Loading() {
           <header className="flex items-center justify-between">
             <BreadcrumbNavSkeleton />
             <div className="flex items-center gap-6">
-              <AuthButtonsSkeleton />
-              <ModeToggleSkeleton />
+              <AuthButtons />
+              <ModeToggleButton />
             </div>
           </header>
 

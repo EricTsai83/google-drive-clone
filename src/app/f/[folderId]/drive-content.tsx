@@ -20,7 +20,6 @@ export default function DriveContents({
     <>
       <div className="mt-6 mb-4 flex justify-between">
         <CreateFolderDialog currentFolderId={currentFolderId} />
-
         <FileUploadDropzoneDialog currentFolderId={currentFolderId} />
       </div>
 
