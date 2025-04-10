@@ -1,9 +1,7 @@
-import { Suspense } from "react";
 import Link from "next/link";
 import { unauthorized } from "next/navigation";
 import { QUERIES } from "@/server/db/queries";
 import { ChevronRight } from "lucide-react";
-import { BreadcrumbNavSkeleton } from "./_components/skeletons/breadcrumb-nav-skeleton";
 
 interface Folder {
   id: number;
@@ -38,22 +36,20 @@ export async function BreadcrumbNav({
   const parents = await getValidatedParents(folderId, currentFolderOwnerId);
 
   return (
-    <Suspense fallback={<BreadcrumbNavSkeleton />}>
-      <nav>
-        <ol className="inline-flex items-center space-x-2">
-          <li>
-            <Link href="/" className="cursor-pointer">
-              My Drive
-            </Link>
+    <nav>
+      <ol className="inline-flex items-center space-x-2">
+        <li>
+          <Link href="/" className="cursor-pointer">
+            My Drive
+          </Link>
+        </li>
+        {parents.map((folder) => (
+          <li key={folder.id} className="inline-flex items-center">
+            <ChevronRight size={16} className="mx-2" />
+            <Link href={`/f/${folder.id}`}>{folder.name}</Link>
           </li>
-          {parents.map((folder) => (
-            <li key={folder.id} className="inline-flex items-center">
-              <ChevronRight size={16} className="mx-2" />
-              <Link href={`/f/${folder.id}`}>{folder.name}</Link>
-            </li>
-          ))}
-        </ol>
-      </nav>
-    </Suspense>
+        ))}
+      </ol>
+    </nav>
   );
 }

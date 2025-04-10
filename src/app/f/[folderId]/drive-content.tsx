@@ -4,9 +4,6 @@ import { FileUploadDropzoneDialog } from "./_components/file-upload-dropzone-dia
 import { Footer } from "@/components/footer";
 import TableBody from "./_components/table-body";
 // Skeleton components
-import { CreateFolderDialogSkeleton } from "./_components/skeletons/create-folder-dialog-skeleton";
-import { FileUploadDropzoneDialogSkeleton } from "./_components/skeletons/file-upload-dropzone-dialog-skeleton";
-import { TableHeaderSkeleton } from "./_components/skeletons/table-header-skeleton";
 import { ItemRowSkeletonList } from "./_components/skeletons/item-row-skeleton";
 
 type DriveContentsProps = {
@@ -21,21 +18,16 @@ export default function DriveContents({
   return (
     <>
       <div className="mt-6 mb-4 flex justify-between">
-        <Suspense fallback={<CreateFolderDialogSkeleton />}>
-          <CreateFolderDialog currentFolderId={currentFolderId} />
-        </Suspense>
-        <Suspense fallback={<FileUploadDropzoneDialogSkeleton />}>
-          <FileUploadDropzoneDialog currentFolderId={currentFolderId} />
-        </Suspense>
+        <CreateFolderDialog currentFolderId={currentFolderId} />
+
+        <FileUploadDropzoneDialog currentFolderId={currentFolderId} />
       </div>
 
       <div className="flex flex-1 flex-col overflow-hidden rounded-lg shadow-xl">
         <div className="bg-primary flex-shrink-0 border-b px-6 py-4">
-          <Suspense fallback={<TableHeaderSkeleton />}>
-            <TableHeader />
-          </Suspense>
+          <TableHeader />
         </div>
-        <Suspense fallback={<ItemRowSkeletonList count={6} />}>
+        <Suspense fallback={<ItemRowSkeletonList count={9} />}>
           <TableBody
             folderId={currentFolderId}
             currentFolderOwnerId={currentFolderOwnerId}

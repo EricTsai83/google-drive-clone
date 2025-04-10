@@ -6,6 +6,8 @@ import { unauthorized } from "next/navigation";
 import { AuthButtons } from "./auth-buttons";
 import { BreadcrumbNav } from "./breadcrumb-nav";
 import { ModeToggleButton } from "@/components/client-mode-toggle";
+import { BreadcrumbNavSkeleton } from "./_components/skeletons/breadcrumb-nav-skeleton";
+import { Suspense } from "react";
 
 export default async function DrivePage(props: {
   params: Promise<{ folderId: string }>;
@@ -34,10 +36,12 @@ export default async function DrivePage(props: {
       <div className="flex-1 overflow-hidden p-8">
         <div className="mx-auto flex h-full max-w-6xl flex-col">
           <header className="flex items-center justify-between">
-            <BreadcrumbNav
-              folderId={parsedFolderId}
-              currentFolderOwnerId={currentFolderOwnerId}
-            />
+            <Suspense fallback={<BreadcrumbNavSkeleton />}>
+              <BreadcrumbNav
+                folderId={parsedFolderId}
+                currentFolderOwnerId={currentFolderOwnerId}
+              />
+            </Suspense>
             <div className="flex items-center gap-6">
               <AuthButtons />
               <ModeToggleButton />

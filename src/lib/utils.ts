@@ -17,3 +17,7 @@ export function formatFileSize(bytes: number) {
 
   return `${(bytes / Math.pow(1024, i)).toFixed(2)} ${sizes[i]}`;
 }
+
+export function waitFor(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
