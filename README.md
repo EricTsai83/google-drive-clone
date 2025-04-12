@@ -36,6 +36,7 @@
 - [x] Improve the UX by optimizing data fetching strategies
 - [x] Create a theme mode toggle component
 - [x] Enhance the table with React Suspense by displaying a skeleton loader while fetching data
+- [x] Prettify website style
 - [ ] Add infinite scroll
 - [ ] Implement all authentication stuff, including the per-user upload limit
 - [ ] Refactor the async code using the tryCatch utility function

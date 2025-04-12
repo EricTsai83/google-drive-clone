@@ -36,20 +36,16 @@ export async function BreadcrumbNav({
   const parents = await getValidatedParents(folderId, currentFolderOwnerId);
 
   return (
-    <nav>
-      <ol className="inline-flex items-center space-x-2">
-        <li>
-          <Link href="/" className="cursor-pointer">
-            My Drive
-          </Link>
-        </li>
+    <nav className="flex items-center">
+      <div>My Drive</div>
+      <div className="flex items-center">
         {parents.map((folder) => (
-          <li key={folder.id} className="inline-flex items-center">
+          <div key={folder.id} className="inline-flex items-center">
             <ChevronRight size={16} className="mx-2" />
             <Link href={`/f/${folder.id}`}>{folder.name}</Link>
-          </li>
+          </div>
         ))}
-      </ol>
+      </div>
     </nav>
   );
 }

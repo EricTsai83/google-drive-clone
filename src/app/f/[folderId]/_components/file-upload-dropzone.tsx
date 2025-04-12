@@ -162,7 +162,7 @@ export function FileUploadDropzone({
           button:
             "ut-ready:bg-red-500 ut-uploading:cursor-not-allowed ut-uploading:pointer-events-none ut-readying:bg-red-500/50 bg-red-400 after:bg-red-500  focus:outline-none focus:ring-0 focus:ring-offset-0",
           container:
-            "cursor-pointer ut-uploading:pointer-events-none h-[400px]",
+            "cursor-pointer ut-uploading:pointer-events-none h-[400px] border-1 dark:border-gray-800 border-gray-300 rounded-md",
           label: "flex flex-col justify-start",
           uploadIcon: filesToUpload.length > 0 ? "hidden" : undefined,
           allowedContent: filesToUpload.length > 0 ? "hidden" : undefined,

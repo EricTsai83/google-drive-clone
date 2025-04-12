@@ -3,9 +3,7 @@ import DriveContents from "./drive-content";
 import { QUERIES } from "@/server/db/queries";
 import { auth } from "@clerk/nextjs/server";
 import { unauthorized } from "next/navigation";
-import { AuthButtons } from "./auth-buttons";
 import { BreadcrumbNav } from "./breadcrumb-nav";
-import { ModeToggleButton } from "@/components/client-mode-toggle";
 import { BreadcrumbNavSkeleton } from "./_components/skeletons/breadcrumb-nav-skeleton";
 import { Suspense } from "react";
 
@@ -33,18 +31,12 @@ export default async function ForderPage(props: {
 
   return (
     <>
-      <header className="flex items-center justify-between">
-        <Suspense fallback={<BreadcrumbNavSkeleton />}>
-          <BreadcrumbNav
-            folderId={parsedFolderId}
-            currentFolderOwnerId={currentFolderOwnerId}
-          />
-        </Suspense>
-        <div className="flex items-center gap-6">
-          <AuthButtons />
-          <ModeToggleButton />
-        </div>
-      </header>
+      <Suspense fallback={<BreadcrumbNavSkeleton />}>
+        <BreadcrumbNav
+          folderId={parsedFolderId}
+          currentFolderOwnerId={currentFolderOwnerId}
+        />
+      </Suspense>
       <DriveContents
         currentFolderId={parsedFolderId}
         currentFolderOwnerId={currentFolderOwnerId}

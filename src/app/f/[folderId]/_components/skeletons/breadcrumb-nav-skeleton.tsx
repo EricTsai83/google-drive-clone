@@ -1,15 +1,10 @@
-import Link from "next/link";
 import { ChevronRight } from "lucide-react";
 import React from "react";
 
 export function BreadcrumbNavSkeleton() {
   return (
-    <div className="flex items-center">
-      {/* My Drive skeleton */}
-      <Link href="/" className="mr-2 cursor-pointer">
-        My Drive
-      </Link>
-
+    <nav className="flex items-center">
+      <div>My Drive</div>
       <div className="flex items-center">
         {Array.from({ length: 3 }).map((_, index) => (
           <React.Fragment key={index}>
@@ -18,6 +13,6 @@ export function BreadcrumbNavSkeleton() {
           </React.Fragment>
         ))}
       </div>
-    </div>
+    </nav>
   );
 }
