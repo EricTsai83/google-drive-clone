@@ -32,27 +32,23 @@ export default async function ForderPage(props: {
   }
 
   return (
-    <div className="flex h-screen flex-col">
-      <div className="flex-1 overflow-hidden p-8">
-        <div className="mx-auto flex h-full max-w-6xl flex-col">
-          <header className="flex items-center justify-between">
-            <Suspense fallback={<BreadcrumbNavSkeleton />}>
-              <BreadcrumbNav
-                folderId={parsedFolderId}
-                currentFolderOwnerId={currentFolderOwnerId}
-              />
-            </Suspense>
-            <div className="flex items-center gap-6">
-              <AuthButtons />
-              <ModeToggleButton />
-            </div>
-          </header>
-          <DriveContents
-            currentFolderId={parsedFolderId}
+    <>
+      <header className="flex items-center justify-between">
+        <Suspense fallback={<BreadcrumbNavSkeleton />}>
+          <BreadcrumbNav
+            folderId={parsedFolderId}
             currentFolderOwnerId={currentFolderOwnerId}
           />
+        </Suspense>
+        <div className="flex items-center gap-6">
+          <AuthButtons />
+          <ModeToggleButton />
         </div>
-      </div>
-    </div>
+      </header>
+      <DriveContents
+        currentFolderId={parsedFolderId}
+        currentFolderOwnerId={currentFolderOwnerId}
+      />
+    </>
   );
 }
