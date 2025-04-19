@@ -31,10 +31,10 @@ export const folders_table = createTable(
     createdAt: timestamp("created_at").notNull().defaultNow(),
     lastModified: timestamp("last_modified").notNull().defaultNow(),
   },
-  (t) => ({
-    parentIndex: index("folders_parent_index").on(t.parent),
-    ownerIdIndex: index("folders_owner_id_index").on(t.ownerId),
-  }),
+  (table) => [
+    index("folders_parent_index").on(table.parent),
+    index("folders_owner_id_index").on(table.ownerId),
+  ],
 );
 
 export const files_table = createTable(
@@ -56,10 +56,10 @@ export const files_table = createTable(
     createdAt: timestamp("created_at").notNull().defaultNow(),
     lastModified: timestamp("last_modified").notNull().defaultNow(),
   },
-  (t) => ({
-    parentIndex: index("files_parent_index").on(t.parent),
-    ownerIdIndex: index("files_owner_id_index").on(t.ownerId),
-  }),
+  (table) => [
+    index("files_parent_index").on(table.parent),
+    index("files_owner_id_index").on(table.ownerId),
+  ],
 );
 
 export type DB_FolderType = typeof folders_table.$inferSelect;
