@@ -37,8 +37,11 @@
 - [x] Create a theme mode toggle component
 - [x] Enhance the table with React Suspense by displaying a skeleton loader while fetching data
 - [x] Prettify website style
-- [ ] Add infinite scroll
+- [ ] Add infinite scroll using Cursor-based pagination and trpc
 - [ ] Implement all authentication stuff, including the per-user upload limit
 - [ ] Refactor the async code using the tryCatch utility function
 - [ ] Improve the error handling stuff
 - [ ] Implement mobile layout
+- [ ] Block some extensions like .exe, .sh, etc.
+- [ ] close the dropdown menu when a menu item is clicked
+- [ ] Implement the search functionality

@@ -44,6 +44,7 @@
     "posthog-js": "^1.234.9",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
+    "react-intersection-observer": "^9.16.0",
     "react-use-measure": "^2.1.7",
     "server-only": "^0.0.1",
     "sonner": "^2.0.3",
