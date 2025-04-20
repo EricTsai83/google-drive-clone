@@ -5,7 +5,9 @@ import {
   pgTableCreator,
   timestamp,
   varchar,
+  text,
 } from "drizzle-orm/pg-core";
+import { sql } from "drizzle-orm";
 
 /**
  * This is an example of how to use the multi-project schema feature of Drizzle ORM. Use the same
@@ -23,6 +25,9 @@ export const folders_table = createTable(
       .generatedByDefaultAsIdentity(),
     ownerId: varchar("owner_id", { length: 256 }).notNull(),
     name: varchar("name", { length: 256 }).notNull(),
+    type: text("type")
+      .notNull()
+      .default(sql`'folder'`),
     parent: bigint("parent", { mode: "number" })
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       .references((): any => folders_table.id, {
@@ -34,6 +39,12 @@ export const folders_table = createTable(
   (table) => [
     index("folders_parent_index").on(table.parent),
     index("folders_owner_id_index").on(table.ownerId),
+    index("folders_last_modified_index").on(table.lastModified),
+    index("folders_parent_lm_id_idx").on(
+      table.parent,
+      table.lastModified,
+      table.id,
+    ),
   ],
 );
 
@@ -48,6 +59,9 @@ export const files_table = createTable(
     name: varchar("name", { length: 256 }).notNull(),
     size: integer("size").notNull(),
     url: varchar("url", { length: 256 }).notNull(),
+    type: text("type")
+      .notNull()
+      .default(sql`'file'`),
     parent: bigint("parent", { mode: "number" })
       .notNull()
       .references(() => folders_table.id, {
@@ -59,6 +73,12 @@ export const files_table = createTable(
   (table) => [
     index("files_parent_index").on(table.parent),
     index("files_owner_id_index").on(table.ownerId),
+    index("files_last_modified_index").on(table.lastModified),
+    index("files_parent_lm_id_idx").on(
+      table.parent,
+      table.lastModified,
+      table.id,
+    ),
   ],
 );
 

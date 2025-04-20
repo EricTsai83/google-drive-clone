@@ -1,7 +1,6 @@
 import { postRouter } from "@/server/api/routers/post";
 import { folderRouter } from "@/server/api/routers/folder";
 import { createCallerFactory, createTRPCRouter } from "@/server/api/trpc";
-
 /**
  * This is the primary router for your server.
  *

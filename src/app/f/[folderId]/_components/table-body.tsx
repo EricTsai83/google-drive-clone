@@ -1,8 +1,6 @@
 "use client";
 
-// import { unauthorized } from "next/navigation";
-// import { QUERIES } from "@/server/db/queries";
-import { ItemRow } from "./item-row";
+import { ItemRow, type Item } from "./item-row";
 import { api } from "@/trpc/react";
 import { useEffect } from "react";
 import { useInView } from "react-intersection-observer";
@@ -17,14 +15,15 @@ export default function TableBody({
   folderId,
   currentFolderOwnerId,
 }: TableBodyProps) {
-  const { ref, inView } = useInView({ threshold: 0 });
+  const { ref, inView } = useInView({
+    threshold: 0.5,
+    rootMargin: "100px 0px",
+    triggerOnce: false,
+  });
 
-  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, status } =
+  const { data, fetchNextPage, hasNextPage, isFetchingNextPage } =
     api.folder.getFolderContents.useInfiniteQuery(
-      {
-        folderId,
-        limit: 5,
-      },
+      { folderId, limit: 5 },
       {
         getNextPageParam: (lastPage) => lastPage.nextCursor,
       },
@@ -36,49 +35,24 @@ export default function TableBody({
     }
   }, [inView, hasNextPage, isFetchingNextPage, fetchNextPage]);
 
-  if (status === "error") {
-    return <div>Error loading contents</div>;
-  }
-
-  const allContents =
-    data?.pages.flatMap((page) => [...page.folders, ...page.files]) ?? [];
-
-  // Verify ownership
-  const hasInvalidContents = allContents.some(
-    (content) => content.ownerId !== currentFolderOwnerId,
-  );
-
-  if (hasInvalidContents) {
-    throw new Error("Unauthorized");
-  }
-
-  // const contents =  await QUERIES.getFolderContents(folderId);
-
-  // 驗證 folders 與 files 中所有項目的 ownerId 是否與 currentFolderOwnerId 相同
-  // const hasInvalidContents = contents.some(
-  //   (content) => content.ownerId !== currentFolderOwnerId,
-  // );
-
-  // if (hasInvalidContents) {
-  //   unauthorized();
-  // }
+  const items: Item[] = data
+    ? data.pages.flatMap((pg) => pg.items as Item[])
+    : [];
 
   return (
     <ul className="bg-popover flex h-full flex-col overflow-y-auto">
-      {allContents.map((content) => (
-        <ItemRow
-          key={`${content.type}-${content.id}`}
-          item={content}
-          type={content.type}
-        />
+      {items.map((item) => (
+        <ItemRow key={`${item.type}-${item.id}`} item={item} />
       ))}
 
-      {/* Loading indicator */}
-      <div ref={ref} className="h-8 w-full">
-        {isFetchingNextPage && (
-          <div className="flex justify-center py-2">Loading more...</div>
-        )}
-      </div>
+      {/* 這個 li 在捲動到它時，就會觸發 inView */}
+      <li ref={ref} className="py-4 text-center">
+        {isFetchingNextPage
+          ? "Loading more…"
+          : hasNextPage
+            ? "Scroll down to load more"
+            : "No more items"}
+      </li>
     </ul>
   );
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import type { files_table, folders_table } from "@/server/db/schema";
+// import type { files_table, folders_table } from "@/server/db/schema";
 import { Folder as FolderIcon, FileIcon } from "lucide-react";
 import Link from "next/link";
 import { ActionDropdownMenu } from "./action-dropdown-menu";
@@ -10,14 +10,14 @@ import { cn, formatFileSize } from "@/lib/utils";
 import { Eye } from "lucide-react";
 import { validImageExtensions } from "@/common/full-page-image-view";
 
-export function ItemRow({
-  item,
-  type,
-}: {
-  item: typeof files_table.$inferSelect | typeof folders_table.$inferSelect;
-  type: "file" | "folder";
-}) {
-  const Icon = type === "folder" ? FolderIcon : FileIcon;
+export type Item = {
+  id: number;
+  name: string;
+  lastModified: Date;
+} & ({ type: "file"; size: number } | { type: "folder"; size: null });
+
+export function ItemRow({ item }: { item: Item }) {
+  const Icon = item.type === "folder" ? FolderIcon : FileIcon;
   const [isDeleting, setIsDeleting] = useState(false);
 
   return (
@@ -29,7 +29,7 @@ export function ItemRow({
       <div className="grid grid-cols-12 items-center gap-4">
         {/* Folder name */}
         <div className="col-span-6 flex items-center">
-          {type === "folder" ? (
+          {item.type === "folder" ? (
             <Link
               className={cn("flex items-center", {
                 "cursor-not-allowed": isDeleting,
@@ -74,16 +74,14 @@ export function ItemRow({
         </div>
         {/* File size */}
         <div className="col-span-3">
-          {type === "file"
-            ? formatFileSize((item as typeof files_table.$inferSelect).size)
-            : "—"}
+          {item.type === "file" ? formatFileSize(item.size) : "—"}
         </div>
         {/* Actions */}
         <div className="col-span-1">
           <ActionDropdownMenu
             id={item.id}
             name={item.name}
-            type={type}
+            type={item.type}
             setIsDeleting={setIsDeleting}
           />
         </div>

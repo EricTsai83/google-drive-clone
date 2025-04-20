@@ -1,106 +1,88 @@
 import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "@/server/api/trpc";
-import { isNull, eq, gt } from "drizzle-orm";
+import { sql, eq, desc } from "drizzle-orm";
+import { unionAll } from "drizzle-orm/pg-core";
+import { files_table, folders_table } from "@/server/db/schema";
 
 export const folderRouter = createTRPCRouter({
   getFolderContents: protectedProcedure
     .input(
       z.object({
-        folderId: z.number().optional(), // undefined for root folder
-        cursor: z
-          .object({
-            folderId: z.number().optional(),
-            fileId: z.number().optional(),
-          })
-          .optional(),
-        limit: z.number().min(1).max(50).default(10).optional(),
+        folderId: z.number(),
+        limit: z.number().min(1).max(100).default(20),
+        // cursor 由前端维护：最后一条的 type/ts/id
+        cursor: z.number().nullish(),
       }),
     )
-    .query(async ({ ctx, input }) => {
-      const { folderId, cursor, limit = 10 } = input;
+    .query(async ({ input, ctx }) => {
+      const { folderId, limit, cursor } = input;
+      const offset = cursor ?? 0;
 
-      // Get folders with cursor-based pagination
-      const folders = await ctx.db.query.folders_table.findMany({
-        where: (folders_table, { and }) =>
-          and(
-            folderId === undefined
-              ? isNull(folders_table.parent)
-              : eq(folders_table.parent, folderId),
-            cursor?.folderId
-              ? gt(folders_table.id, cursor.folderId)
-              : undefined,
-          ),
-        orderBy: (folders_table, { asc }) => [asc(folders_table.id)],
-        limit: limit + 1, // Fetch one extra to determine if there are more items
-      });
+      // 1) folders 子查詢
+      const foldersQ = ctx.db
+        .select({
+          id: folders_table.id,
+          name: folders_table.name,
+          lastModified: folders_table.lastModified,
+          type: folders_table.type,
+          size: sql`NULL::integer`.as("size"),
+        })
+        .from(folders_table)
+        .where(eq(folders_table.parent, folderId));
 
-      // Get files with cursor-based pagination
-      const files = await ctx.db.query.files_table.findMany({
-        where: (files_table, { and }) =>
-          and(
-            folderId === undefined
-              ? isNull(files_table.parent)
-              : eq(files_table.parent, folderId),
-            cursor?.fileId ? gt(files_table.id, cursor.fileId) : undefined,
-          ),
-        orderBy: (files_table, { asc }) => [asc(files_table.id)],
-        limit: limit + 1, // Fetch one extra to determine if there are more items
-      });
+      // 2) files 子查詢
+      const filesQ = ctx.db
+        .select({
+          id: files_table.id,
+          name: files_table.name,
+          lastModified: files_table.lastModified,
+          type: files_table.type,
+          size: files_table.size,
+        })
+        .from(files_table)
+        .where(eq(files_table.parent, folderId));
 
-      // Process folders
-      let nextFolderCursor: number | undefined = undefined;
-      if (folders.length > limit) {
-        const nextFolder = folders.pop();
-        nextFolderCursor = nextFolder?.id;
-      }
+      // 3) unionAll 並用 as() 成衍生表 unioned
+      const unioned = unionAll(foldersQ, filesQ).as("unioned");
 
-      // Process files
-      let nextFileCursor: number | undefined = undefined;
-      if (files.length > limit) {
-        const nextFile = files.pop();
-        nextFileCursor = nextFile?.id;
-      }
+      // 4) 外層 select + 排序 + 分頁
+      const pagedQ = ctx.db
+        .select({
+          id: unioned.id,
+          name: unioned.name,
+          lastModified: unioned.lastModified,
+          type: unioned.type,
+          size: unioned.size,
+        })
+        .from(unioned)
+        .orderBy(
+          // folder 全部排前面
+          desc(eq(unioned.type, "folder")),
+          // 同類型内部再按時間倒序
+          desc(unioned.lastModified),
+        )
+        .limit(limit + 1)
+        .offset(offset);
 
-      // Only return items if we have a cursor or it's the first page
-      const shouldReturnFolders = !cursor || cursor.folderId !== undefined;
-      const shouldReturnFiles = !cursor || cursor.fileId !== undefined;
+      // 5) 執行 SQL
+      // 用 prepare 後，Drizzle 才會把把查詢的輸出類型固化到 PreparedQuery<…> 的泛型裡，TypeScript 才會知道查詢結果的型別，並且 column name 的 alias 才會被記住
+      const prepared = pagedQ.prepare("pagedQ");
+      const rows = await prepared.execute();
+      const hasMore = rows.length > limit;
+      if (hasMore) rows.pop();
 
-      // If we have no more items for both folders and files, return null for nextCursor
-      const hasMoreItems =
-        nextFolderCursor !== undefined || nextFileCursor !== undefined;
+      // 6) 映射成前端型别
+      const items = rows.map((r) => ({
+        id: Number(r.id),
+        name: r.name,
+        lastModified: r.lastModified,
+        type: r.type as "folder" | "file",
+        size: r.type === "file" ? Number(r.size) : null,
+      }));
 
       return {
-        folders: shouldReturnFolders
-          ? folders.map((folder) => ({
-              id: folder.id,
-              name: folder.name,
-              lastModified: folder.lastModified,
-              type: "folder" as const,
-              ownerId: folder.ownerId,
-              parent: folder.parent,
-              createdAt: folder.createdAt,
-            }))
-          : [],
-        files: shouldReturnFiles
-          ? files.map((file) => ({
-              id: file.id,
-              name: file.name,
-              size: file.size,
-              lastModified: file.lastModified,
-              type: "file" as const,
-              ownerId: file.ownerId,
-              parent: file.parent,
-              createdAt: file.createdAt,
-              utFileKey: file.utFileKey,
-              url: file.url,
-            }))
-          : [],
-        nextCursor: hasMoreItems
-          ? {
-              folderId: nextFolderCursor,
-              fileId: nextFileCursor,
-            }
-          : null,
+        items,
+        nextCursor: hasMore ? offset + limit : undefined,
       };
     }),
 });
