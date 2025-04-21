@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "@/server/api/trpc";
-import { sql, eq, desc } from "drizzle-orm";
+import { sql, eq, desc, and, lt, or } from "drizzle-orm";
 import { unionAll } from "drizzle-orm/pg-core";
 import { files_table, folders_table } from "@/server/db/schema";
 
@@ -10,13 +10,17 @@ export const folderRouter = createTRPCRouter({
       z.object({
         folderId: z.number(),
         limit: z.number().min(1).max(100).default(20),
-        // cursor 由前端维护：最后一条的 type/ts/id
-        cursor: z.number().nullish(),
+        cursor: z
+          .object({
+            lastModified: z.date(),
+            id: z.number(),
+            phase: z.enum(["folders", "files"]),
+          })
+          .nullish(),
       }),
     )
     .query(async ({ input, ctx }) => {
       const { folderId, limit, cursor } = input;
-      const offset = cursor ?? 0;
 
       // 1) folders 子查詢
       const foldersQ = ctx.db
@@ -46,7 +50,7 @@ export const folderRouter = createTRPCRouter({
       const unioned = unionAll(foldersQ, filesQ).as("unioned");
 
       // 4) 外層 select + 排序 + 分頁
-      const pagedQ = ctx.db
+      const baseQuery = ctx.db
         .select({
           id: unioned.id,
           name: unioned.name,
@@ -54,18 +58,52 @@ export const folderRouter = createTRPCRouter({
           type: unioned.type,
           size: unioned.size,
         })
-        .from(unioned)
+        .from(unioned);
+
+      // 添加 cursor 條件
+      const whereClause = cursor
+        ? and(
+            or(
+              // 1. 如果還在取 folder 階段，取比這個 folder 更早的 folder
+              and(
+                eq(unioned.type, "folder"),
+                sql`${cursor.phase} = 'folders'`,
+                or(
+                  lt(unioned.lastModified, cursor.lastModified),
+                  and(
+                    eq(unioned.lastModified, cursor.lastModified),
+                    lt(unioned.id, cursor.id),
+                  ),
+                ),
+              ),
+              // 2. 如果已經開始取 file 階段，取比這個 file 更早的 file
+              and(
+                eq(unioned.type, "file"),
+                sql`${cursor.phase} = 'files'`,
+                or(
+                  lt(unioned.lastModified, cursor.lastModified),
+                  and(
+                    eq(unioned.lastModified, cursor.lastModified),
+                    lt(unioned.id, cursor.id),
+                  ),
+                ),
+              ),
+              // 3. 如果剛從 folder 階段轉到 file 階段，取所有的 file
+              and(eq(unioned.type, "file"), sql`${cursor.phase} = 'folders'`),
+            ),
+          )
+        : undefined;
+
+      const pagedQ = baseQuery
+        .where(whereClause)
         .orderBy(
-          // folder 全部排前面
           desc(eq(unioned.type, "folder")),
-          // 同類型内部再按時間倒序
           desc(unioned.lastModified),
+          desc(unioned.id),
         )
-        .limit(limit + 1)
-        .offset(offset);
+        .limit(limit + 1);
 
       // 5) 執行 SQL
-      // 用 prepare 後，Drizzle 才會把把查詢的輸出類型固化到 PreparedQuery<…> 的泛型裡，TypeScript 才會知道查詢結果的型別，並且 column name 的 alias 才會被記住
       const prepared = pagedQ.prepare("pagedQ");
       const rows = await prepared.execute();
       const hasMore = rows.length > limit;
@@ -80,9 +118,19 @@ export const folderRouter = createTRPCRouter({
         size: r.type === "file" ? Number(r.size) : null,
       }));
 
+      const lastItem = rows[rows.length - 1];
+      const nextPhase = lastItem?.type === "file" ? "files" : "folders";
+
       return {
         items,
-        nextCursor: hasMore ? offset + limit : undefined,
+        nextCursor:
+          hasMore && lastItem
+            ? {
+                lastModified: lastItem.lastModified,
+                id: Number(lastItem.id),
+                phase: nextPhase,
+              }
+            : undefined,
       };
     }),
 });
