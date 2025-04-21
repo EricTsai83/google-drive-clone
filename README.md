@@ -45,3 +45,5 @@
 - [ ] Block some extensions like .exe, .sh, etc.
 - [ ] close the dropdown menu when a menu item is clicked
 - [ ] Implement the search functionality
+- [ ] Improve the UX of the file view page
+- [ ] Simplify code

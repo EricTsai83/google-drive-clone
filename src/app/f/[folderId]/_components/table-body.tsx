@@ -25,14 +25,7 @@ export default function TableBody({
     api.folder.getFolderContents.useInfiniteQuery(
       { folderId, limit: 5 },
       {
-        getNextPageParam: (lastPage) => {
-          if (!lastPage.nextCursor) return undefined;
-          return {
-            lastModified: lastPage.nextCursor.lastModified,
-            id: lastPage.nextCursor.id,
-            phase: lastPage.nextCursor.phase as "folders" | "files",
-          };
-        },
+        getNextPageParam: (lastPage) => lastPage.nextCursor,
       },
     );
 

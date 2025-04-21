@@ -4,19 +4,20 @@ import { sql, eq, desc, and, lt, or } from "drizzle-orm";
 import { unionAll } from "drizzle-orm/pg-core";
 import { files_table, folders_table } from "@/server/db/schema";
 
+// Type definitions
+const FolderCursorSchema = z.object({
+  lastModified: z.date(),
+  id: z.number(),
+  phase: z.enum(["folders", "files"]),
+});
+
 export const folderRouter = createTRPCRouter({
   getFolderContents: protectedProcedure
     .input(
       z.object({
         folderId: z.number(),
         limit: z.number().min(1).max(100).default(20),
-        cursor: z
-          .object({
-            lastModified: z.date(),
-            id: z.number(),
-            phase: z.enum(["folders", "files"]),
-          })
-          .nullish(),
+        cursor: FolderCursorSchema.nullish(),
       }),
     )
     .query(async ({ input, ctx }) => {
@@ -64,7 +65,7 @@ export const folderRouter = createTRPCRouter({
       const whereClause = cursor
         ? and(
             or(
-              // 1. 如果還在取 folder 階段，取比這個 folder 更早的 folder
+              // 文件夾階段
               and(
                 eq(unioned.type, "folder"),
                 sql`${cursor.phase} = 'folders'`,
@@ -76,20 +77,25 @@ export const folderRouter = createTRPCRouter({
                   ),
                 ),
               ),
-              // 2. 如果已經開始取 file 階段，取比這個 file 更早的 file
+              // 文件階段
               and(
                 eq(unioned.type, "file"),
-                sql`${cursor.phase} = 'files'`,
                 or(
-                  lt(unioned.lastModified, cursor.lastModified),
+                  // 如果還在文件夾階段，取所有文件
+                  sql`${cursor.phase} = 'folders'`,
+                  // 如果已經在文件階段，取比當前文件更早的文件
                   and(
-                    eq(unioned.lastModified, cursor.lastModified),
-                    lt(unioned.id, cursor.id),
+                    sql`${cursor.phase} = 'files'`,
+                    or(
+                      lt(unioned.lastModified, cursor.lastModified),
+                      and(
+                        eq(unioned.lastModified, cursor.lastModified),
+                        lt(unioned.id, cursor.id),
+                      ),
+                    ),
                   ),
                 ),
               ),
-              // 3. 如果剛從 folder 階段轉到 file 階段，取所有的 file
-              and(eq(unioned.type, "file"), sql`${cursor.phase} = 'folders'`),
             ),
           )
         : undefined;
@@ -107,7 +113,6 @@ export const folderRouter = createTRPCRouter({
       const prepared = pagedQ.prepare("pagedQ");
       const rows = await prepared.execute();
       const hasMore = rows.length > limit;
-      if (hasMore) rows.pop();
 
       // 6) 映射成前端型别
       const items = rows.map((r) => ({
@@ -118,19 +123,51 @@ export const folderRouter = createTRPCRouter({
         size: r.type === "file" ? Number(r.size) : null,
       }));
 
+      // 7) 確定下一個 cursor
       const lastItem = rows[rows.length - 1];
-      const nextPhase = lastItem?.type === "file" ? "files" : "folders";
+      let nextCursor = undefined;
+
+      if (hasMore && lastItem) {
+        // 如果最後一個項目是文件夾，繼續在文件夾階段
+        if (lastItem.type === "folder") {
+          nextCursor = {
+            lastModified: lastItem.lastModified,
+            id: Number(lastItem.id),
+            phase: "folders" as const,
+          };
+        } else {
+          // 如果最後一個項目是文件，進入文件階段
+          nextCursor = {
+            lastModified: lastItem.lastModified,
+            id: Number(lastItem.id),
+            phase: "files" as const,
+          };
+        }
+      } else if (lastItem?.type === "folder") {
+        // 如果沒有更多項目，但最後一個是文件夾，需要切換到文件階段
+        // 使用最新的文件時間作為起始點
+        const latestFile = await ctx.db
+          .select({
+            lastModified: files_table.lastModified,
+            id: files_table.id,
+          })
+          .from(files_table)
+          .where(eq(files_table.parent, folderId))
+          .orderBy(desc(files_table.lastModified), desc(files_table.id))
+          .limit(1);
+
+        if (latestFile.length > 0 && latestFile[0]) {
+          nextCursor = {
+            lastModified: latestFile[0].lastModified,
+            id: Number(latestFile[0].id),
+            phase: "files" as const,
+          };
+        }
+      }
 
       return {
         items,
-        nextCursor:
-          hasMore && lastItem
-            ? {
-                lastModified: lastItem.lastModified,
-                id: Number(lastItem.id),
-                phase: nextPhase,
-              }
-            : undefined,
+        nextCursor,
       };
     }),
 });
