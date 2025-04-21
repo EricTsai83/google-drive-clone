@@ -61,6 +61,40 @@ export const folderRouter = createTRPCRouter({
         })
         .from(unioned);
 
+      // Helper functions for cursor-based pagination
+      /**
+       * Checks if an item should appear before the cursor in the pagination order
+       * by comparing lastModified timestamp and id
+       */
+      function isBeforeCursor(
+        item: typeof unioned,
+        cursor: NonNullable<typeof input.cursor>,
+      ) {
+        return or(
+          lt(item.lastModified, cursor.lastModified),
+          and(
+            eq(item.lastModified, cursor.lastModified),
+            lt(item.id, cursor.id),
+          ),
+        );
+      }
+
+      /**
+       * Checks if we're currently in the folders phase of pagination
+       * where we're still fetching folders before moving to files
+       */
+      function isFolderPhase(cursor: NonNullable<typeof input.cursor>) {
+        return sql`${cursor.phase} = 'folders'`;
+      }
+
+      /**
+       * Checks if we've moved to the files phase of pagination
+       * where we're now fetching files after all folders
+       */
+      function isFilePhase(cursor: NonNullable<typeof input.cursor>) {
+        return sql`${cursor.phase} = 'files'`;
+      }
+
       // 添加 cursor 條件
       const whereClause = cursor
         ? and(
@@ -68,32 +102,17 @@ export const folderRouter = createTRPCRouter({
               // 文件夾階段
               and(
                 eq(unioned.type, "folder"),
-                sql`${cursor.phase} = 'folders'`,
-                or(
-                  lt(unioned.lastModified, cursor.lastModified),
-                  and(
-                    eq(unioned.lastModified, cursor.lastModified),
-                    lt(unioned.id, cursor.id),
-                  ),
-                ),
+                isFolderPhase(cursor),
+                isBeforeCursor(unioned, cursor),
               ),
               // 文件階段
               and(
                 eq(unioned.type, "file"),
                 or(
                   // 如果還在文件夾階段，取所有文件
-                  sql`${cursor.phase} = 'folders'`,
+                  isFolderPhase(cursor),
                   // 如果已經在文件階段，取比當前文件更早的文件
-                  and(
-                    sql`${cursor.phase} = 'files'`,
-                    or(
-                      lt(unioned.lastModified, cursor.lastModified),
-                      and(
-                        eq(unioned.lastModified, cursor.lastModified),
-                        lt(unioned.id, cursor.id),
-                      ),
-                    ),
-                  ),
+                  and(isFilePhase(cursor), isBeforeCursor(unioned, cursor)),
                 ),
               ),
             ),
