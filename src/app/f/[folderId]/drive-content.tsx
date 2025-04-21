@@ -1,10 +1,7 @@
-import { Suspense } from "react";
 import { CreateFolderDialog } from "@/app/f/[folderId]/_components/create-folder-dialog";
 import { FileUploadDropzoneDialog } from "./_components/file-upload-dropzone-dialog";
 
 import TableBody from "./_components/table-body";
-// Skeleton components
-import { TableBodySkeleton } from "./_components/skeletons/item-row-skeleton";
 import { TableHeader } from "./_components/table-header";
 
 type DriveContentsProps = {
@@ -23,9 +20,7 @@ export default function DriveContents({ currentFolderId }: DriveContentsProps) {
         <div className="bg-primary flex-shrink-0 border-b px-6 py-4">
           <TableHeader />
         </div>
-        <Suspense fallback={<TableBodySkeleton />}>
-          <TableBody folderId={currentFolderId} />
-        </Suspense>
+        <TableBody folderId={currentFolderId} />
       </div>
     </>
   );

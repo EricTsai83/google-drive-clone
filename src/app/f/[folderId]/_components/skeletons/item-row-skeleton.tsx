@@ -28,7 +28,7 @@ export function ItemRowSkeleton() {
 }
 
 // 如果需要多行 skeleton，可以使用這個組件
-export function TableBodySkeleton({ count = 18 }: { count?: number }) {
+export function TableBodySkeleton({ count = 8 }: { count?: number }) {
   return (
     <div className="relative h-full w-full">
       <ul className="bg-popover flex h-full flex-col overflow-y-auto">
