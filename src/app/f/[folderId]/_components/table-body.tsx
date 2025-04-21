@@ -8,13 +8,9 @@ import React from "react";
 
 export type TableBodyProps = {
   folderId: number;
-  currentFolderOwnerId: string;
 };
 
-export default function TableBody({
-  folderId,
-  currentFolderOwnerId,
-}: TableBodyProps) {
+export default function TableBody({ folderId }: TableBodyProps) {
   const { ref, inView } = useInView({
     threshold: 0.5,
     rootMargin: "100px 0px",

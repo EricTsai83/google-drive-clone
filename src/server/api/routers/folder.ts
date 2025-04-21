@@ -3,6 +3,7 @@ import { createTRPCRouter, protectedProcedure } from "@/server/api/trpc";
 import { sql, eq, desc, and, lt, or } from "drizzle-orm";
 import { unionAll } from "drizzle-orm/pg-core";
 import { files_table, folders_table } from "@/server/db/schema";
+import { TRPCError } from "@trpc/server";
 
 // Type definitions
 const FolderCursorSchema = z.object({
@@ -22,6 +23,24 @@ export const folderRouter = createTRPCRouter({
     )
     .query(async ({ input, ctx }) => {
       const { folderId, limit, cursor } = input;
+
+      // 檢查資料夾是否存在且屬於當前用戶
+      const [folder] = await ctx.db
+        .select({ id: folders_table.id })
+        .from(folders_table)
+        .where(
+          and(
+            eq(folders_table.id, folderId),
+            eq(folders_table.ownerId, ctx.auth.userId),
+          ),
+        );
+
+      if (!folder) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Folder not found or you don't have access to it",
+        });
+      }
 
       // 1) folders 子查詢
       const foldersQ = ctx.db

@@ -9,13 +9,9 @@ import { TableHeader } from "./_components/table-header";
 
 type DriveContentsProps = {
   currentFolderId: number;
-  currentFolderOwnerId: string;
 };
 
-export default function DriveContents({
-  currentFolderId,
-  currentFolderOwnerId,
-}: DriveContentsProps) {
+export default function DriveContents({ currentFolderId }: DriveContentsProps) {
   return (
     <>
       <div className="mt-6 mb-4 flex justify-between">
@@ -28,10 +24,7 @@ export default function DriveContents({
           <TableHeader />
         </div>
         <Suspense fallback={<TableBodySkeleton />}>
-          <TableBody
-            folderId={currentFolderId}
-            currentFolderOwnerId={currentFolderOwnerId}
-          />
+          <TableBody folderId={currentFolderId} />
         </Suspense>
       </div>
     </>

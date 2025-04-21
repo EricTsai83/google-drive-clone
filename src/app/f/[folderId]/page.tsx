@@ -37,10 +37,7 @@ export default async function ForderPage(props: {
           currentFolderOwnerId={currentFolderOwnerId}
         />
       </Suspense>
-      <DriveContents
-        currentFolderId={parsedFolderId}
-        currentFolderOwnerId={currentFolderOwnerId}
-      />
+      <DriveContents currentFolderId={parsedFolderId} />
     </>
   );
 }
