@@ -45,9 +45,10 @@
 - [ ] Block some extensions like .exe, .sh, etc.
 - [ ] close the dropdown menu when a menu item is clicked
 - [ ] Implement the search functionality
+- [ ] Sync data to database [Reference](https://www.youtube.com/watch?v=UTjwyDuVjRM)
+- [ ] Generate open graph (OG) Image [Reference](https://vercel.com/docs/og-image-generation)
+- [ ] Implement upload rate limiting [Reference](https://www.youtube.com/watch?v=YkOSUVzOAA4&t=5880s)
+- [ ] Image prefetching
+- [ ] Image preview [Reference](https://ui.aceternity.com/components/link-preview)
 - [ ] Improve the UX of the file view page
 - [ ] Simplify code
-- [ ] Improve image loading experience
-- [ ] Sync data to database
-- [ ] Generate open graph (OG) Image
-- [ ] Implement upload rate limiting
