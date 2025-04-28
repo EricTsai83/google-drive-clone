@@ -50,3 +50,4 @@
 - [ ] Improve image loading experience
 - [ ] Sync data to database
 - [ ] Generate open graph (OG) Image
+- [ ] Implement upload rate limiting
