@@ -47,3 +47,6 @@
 - [ ] Implement the search functionality
 - [ ] Improve the UX of the file view page
 - [ ] Simplify code
+- [ ] Improve image loading experience
+- [ ] Sync data to database
+- [ ] Generate open graph (OG) Image
