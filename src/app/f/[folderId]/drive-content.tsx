@@ -1,6 +1,5 @@
 import { CreateFolderDialog } from "@/app/f/[folderId]/_components/create-folder-dialog";
 import { FileUploadDropzoneDialog } from "./_components/file-upload-dropzone-dialog";
-
 import TableBody from "./_components/table-body";
 import { TableHeader } from "./_components/table-header";
 

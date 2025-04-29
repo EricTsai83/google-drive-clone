@@ -14,6 +14,7 @@ import { createFolder } from "@/server/actions";
 import { Plus } from "lucide-react";
 import { toast } from "sonner";
 import { useState } from "react";
+import { api } from "@/trpc/react";
 
 export function CreateFolderDialog({
   currentFolderId,
@@ -22,6 +23,7 @@ export function CreateFolderDialog({
 }) {
   const [folderName, setFolderName] = useState("New Folder");
   const [isOpen, setIsOpen] = useState(false);
+  const utils = api.useUtils();
 
   async function onCreate(name: string, currentFolderId: number | null) {
     if (!name || name.trim().length === 0) {
@@ -36,6 +38,7 @@ export function CreateFolderDialog({
         return;
       }
       toast.success("Folder created successfully");
+      await utils.folder.getFolderContents.invalidate();
     } catch (error) {
       toast.error(
         `Failed to create folder: ${error instanceof Error ? error.message : "Unknown error"}`,

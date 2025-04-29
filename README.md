@@ -41,7 +41,6 @@
 - [ ] Implement all authentication stuff, including the per-user upload limit
 - [ ] Refactor the async code using the tryCatch utility function
 - [ ] Improve the error handling stuff
-- [ ] Implement mobile layout
 - [ ] Block some extensions like .exe, .sh, etc.
 - [ ] close the dropdown menu when a menu item is clicked
 - [ ] Implement the search functionality
@@ -51,4 +50,5 @@
 - [ ] Image prefetching
 - [ ] Image preview [Reference](https://ui.aceternity.com/components/link-preview)
 - [ ] Improve the UX of the file view page
+- [ ] Implement mobile layout
 - [ ] Simplify code
