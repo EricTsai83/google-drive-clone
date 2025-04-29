@@ -37,8 +37,8 @@ export function CreateFolderDialog({
         toast.error(response.error);
         return;
       }
-      toast.success("Folder created successfully");
       await utils.folder.getFolderContents.invalidate();
+      toast.success("Folder created successfully");
     } catch (error) {
       toast.error(
         `Failed to create folder: ${error instanceof Error ? error.message : "Unknown error"}`,

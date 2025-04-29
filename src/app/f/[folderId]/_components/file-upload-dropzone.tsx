@@ -2,12 +2,12 @@
 
 import { UploadDropzone } from "@/components/uploadthing";
 import { toast } from "sonner";
-import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
 import { nanoid } from "nanoid";
 import { X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { LoadingToast } from "@/components/loading-toast";
+import { api } from "@/trpc/react";
 
 type FileToUpload = {
   name: string;
@@ -28,7 +28,6 @@ export function FileUploadDropzone({
   currentFolderId: number;
   setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
-  const navigate = useRouter();
   // State for storing files awaiting upload
   const [filesToUpload, setFilesToUpload] = useState<FileToUpload[]>([]);
   // Ref to keep track of all selected files
@@ -37,6 +36,7 @@ export function FileUploadDropzone({
   const currentBatchIdRef = useRef<string | null>(null);
   // Ref mapping batch id to its upload process details
   const uploadProcessesRef = useRef<Map<string, UploadProcess>>(new Map());
+  const utils = api.useUtils();
 
   // Function to add new files to the upload list
   const addFiles = (newFiles: FileList | File[]) => {
@@ -126,7 +126,7 @@ export function FileUploadDropzone({
           });
         }}
         // Once the client completes the upload, resolve the upload process
-        onClientUploadComplete={() => {
+        onClientUploadComplete={async () => {
           const batchId = currentBatchIdRef.current;
           if (batchId) {
             const process = uploadProcessesRef.current.get(batchId);
@@ -139,7 +139,7 @@ export function FileUploadDropzone({
           // Clear the files state and refresh the page
           setFilesToUpload([]);
           allFilesRef.current = [];
-          navigate.refresh();
+          await utils.folder.getFolderContents.invalidate();
         }}
         // Handle upload errors
         onUploadError={(error) => {

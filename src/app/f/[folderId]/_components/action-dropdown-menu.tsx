@@ -10,6 +10,7 @@ import { deleteFile, deleteFolder } from "@/server/actions";
 import { MoreHorizontal, Trash2Icon } from "lucide-react";
 import { toast } from "sonner";
 import { RenameDialog } from "@/app/f/[folderId]/_components/rename-dialog";
+import { api } from "@/trpc/react";
 
 export type ActionDropdownMenuProps = {
   id: number;
@@ -26,6 +27,7 @@ export function ActionDropdownMenu({
 }: ActionDropdownMenuProps) {
   const deleteAction = type === "folder" ? deleteFolder : deleteFile;
   const actionLabel = type === "folder" ? "Folder" : "File";
+  const utils = api.useUtils();
 
   return (
     <DropdownMenu>
@@ -41,6 +43,7 @@ export function ActionDropdownMenu({
             setIsDeleting(true);
             try {
               await deleteAction(id);
+              await utils.folder.getFolderContents.invalidate();
               toast.success(`${actionLabel} deleted successfully`);
             } catch (error) {
               setIsDeleting(false);
