@@ -10,6 +10,7 @@ import { LoadingToast } from "@/components/loading-toast";
 import { api } from "@/trpc/react";
 
 type FileToUpload = {
+  id: string;
   name: string;
   file: File;
 };
@@ -44,6 +45,7 @@ export function FileUploadDropzone({
     currentBatchIdRef.current ??= nanoid();
 
     const formattedFiles = Array.from(newFiles).map((file) => ({
+      id: nanoid(),
       name: file.name,
       file,
     }));
@@ -173,7 +175,7 @@ export function FileUploadDropzone({
               <div className="text-secondary-foreground h-full w-full rounded-md p-4">
                 {filesToUpload.map((file) => (
                   <div
-                    key={file.name}
+                    key={file.id}
                     className="flex items-center justify-between border-b border-gray-300 px-2"
                   >
                     <span className="text-sm">{file.name}</span>
