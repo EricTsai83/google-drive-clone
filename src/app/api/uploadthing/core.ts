@@ -42,7 +42,8 @@ export const ourFileRouter = {
         user.userId,
       );
 
-      console.log("Current time:", new Date().toISOString());
+      console.log("Current time (UTC):", new Date().toISOString());
+      console.log("Current time (Local):", new Date().toLocaleString());
       console.log("Reset timestamp:", reset);
       console.log("Reset time (UTC):", new Date(reset).toISOString());
       console.log("Reset time (Local):", new Date(reset).toLocaleString());

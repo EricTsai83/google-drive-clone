@@ -188,9 +188,7 @@ export function FileUploadDropzone({
                         event.stopPropagation();
                         // Remove the selected file from the list
                         setFilesToUpload((prev) => {
-                          const updated = prev.filter(
-                            (f) => f.name !== file.name,
-                          );
+                          const updated = prev.filter((f) => f.id !== file.id);
                           allFilesRef.current = updated;
                           return updated;
                         });
