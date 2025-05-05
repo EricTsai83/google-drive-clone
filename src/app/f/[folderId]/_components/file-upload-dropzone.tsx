@@ -8,6 +8,7 @@ import { X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { LoadingToast } from "@/components/loading-toast";
 import { api } from "@/trpc/react";
+import { Loader } from "lucide-react";
 
 type FileToUpload = {
   id: string;
@@ -162,7 +163,7 @@ export function FileUploadDropzone({
         onChange={(acceptedFiles) => addFiles(acceptedFiles)}
         appearance={{
           button:
-            "ut-ready:bg-red-500 ut-uploading:cursor-not-allowed ut-uploading:pointer-events-none ut-readying:bg-red-500/50 bg-red-400 after:bg-red-500 focus:outline-none focus:ring-0 focus:ring-offset-0",
+            "ut-ready:bg-red-500 ut-uploading:cursor-not-allowed ut-uploading:bg-red-500 ut-uploading:pointer-events-none ut-readying:bg-red-500/50 bg-red-400 after:bg-red-500 focus:outline-none focus:ring-0 focus:ring-offset-0",
           container:
             "cursor-pointer ut-uploading:pointer-events-none h-[400px] border-1 dark:border-gray-800 border-gray-300 rounded-md",
 
@@ -208,10 +209,19 @@ export function FileUploadDropzone({
               </p>
             ),
           // Button content changes based on the upload state
-          button: ({ ready, isUploading, uploadProgress }) => {
+          button: ({
+            ready,
+            isUploading,
+            // uploadProgress
+          }) => {
             if (!ready) return "Loading...";
             if (isUploading) {
-              return <span className="z-50 text-sm">{uploadProgress}%</span>;
+              return (
+                <span className="z-50 animate-spin text-sm">
+                  <Loader className="size-4" />
+                  {/* {uploadProgress}% */}
+                </span>
+              );
             }
             if (filesToUpload.length > 0)
               return `Upload ${filesToUpload.length} file${
