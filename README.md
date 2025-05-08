@@ -39,6 +39,7 @@
 - [x] Prettify website style
 - [x] Add infinite scroll using Cursor-based pagination and trpc
 - [x] Implement upload rate limiting
+- [ ] Implement basic Role Based Access Control (RBAC)
 - [ ] Implement all authentication stuff, including the per-user upload limit
 - [ ] Refactor the async code using the tryCatch utility function
 - [ ] Improve the error handling stuff
@@ -46,6 +47,7 @@
 - [ ] Fix carousel in mobile view
 - [ ] close the dropdown menu when a menu item is clicked
 - [ ] Implement the search functionality
+- [ ] Add favicon
 - [ ] Generate open graph (OG) Image [Reference](https://vercel.com/docs/og-image-generation)
 - [ ] Image prefetching
 - [ ] Image preview [Reference](https://ui.aceternity.com/components/link-preview)
