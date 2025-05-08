@@ -38,17 +38,18 @@
 - [x] Enhance the table with React Suspense by displaying a skeleton loader while fetching data
 - [x] Prettify website style
 - [x] Add infinite scroll using Cursor-based pagination and trpc
+- [x] Implement upload rate limiting
 - [ ] Implement all authentication stuff, including the per-user upload limit
 - [ ] Refactor the async code using the tryCatch utility function
 - [ ] Improve the error handling stuff
 - [ ] Block some extensions like .exe, .sh, etc.
+- [ ] Fix carousel in mobile view
 - [ ] close the dropdown menu when a menu item is clicked
 - [ ] Implement the search functionality
-- [ ] Sync data to database [Reference](https://www.youtube.com/watch?v=UTjwyDuVjRM)
 - [ ] Generate open graph (OG) Image [Reference](https://vercel.com/docs/og-image-generation)
-- [ ] Implement upload rate limiting [Reference](https://www.youtube.com/watch?v=YkOSUVzOAA4&t=5880s)
 - [ ] Image prefetching
 - [ ] Image preview [Reference](https://ui.aceternity.com/components/link-preview)
 - [ ] Improve the UX of the file view page
 - [ ] Implement mobile layout
+- [ ] Manage SVG sprites in React [Reference](https://kurtextrem.de/posts/svg-in-js)
 - [ ] Simplify code
