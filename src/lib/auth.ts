@@ -97,11 +97,8 @@ const folder: Folder = {
   lastModified: new Date(),
 };
 
-// Can create a comment
+// Can upload a file
 hasPermission(user, "files", "uploadFile");
 
-// Can view the `todo` Todo
+// Can view the folder
 hasPermission(user, "folders", "view", folder);
-
-// Can view all todos
-hasPermission(user, "files", "view");

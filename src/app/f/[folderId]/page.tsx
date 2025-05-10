@@ -6,6 +6,7 @@ import { unauthorized } from "next/navigation";
 import { BreadcrumbNav } from "./breadcrumb-nav";
 import { BreadcrumbNavSkeleton } from "./_components/skeletons/breadcrumb-nav-skeleton";
 import { Suspense } from "react";
+import { hasPermission } from "@/lib/auth";
 
 export default async function ForderPage(props: {
   params: Promise<{ folderId: string }>;
@@ -17,17 +18,31 @@ export default async function ForderPage(props: {
     })
     .safeParse(params);
 
+  // TODO: Improve the error handling
   if (!success) return <div>Invalid folder ID</div>;
 
   const parsedFolderId = data.folderId;
 
   // 取得該資料夾的 ownerId
   const currentFolderOwnerId = await QUERIES.getFolderOwner(parsedFolderId);
-  const session = await auth();
+  const { userId, sessionClaims } = await auth();
 
-  if (currentFolderOwnerId !== session.userId) {
+  if (!userId || !sessionClaims || !currentFolderOwnerId) {
     unauthorized();
   }
+  const user = {
+    id: userId,
+    roles: sessionClaims.roles,
+    blockedBy: ["1"],
+  };
+
+  hasPermission(user, "folders", "view", {
+    id: parsedFolderId,
+    ownerId: currentFolderOwnerId,
+  });
+  // if (currentFolderOwnerId !== session.userId) {
+  //   unauthorized();
+  // }
 
   return (
     <>

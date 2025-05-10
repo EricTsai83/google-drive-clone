@@ -51,6 +51,7 @@
 - [ ] Generate open graph (OG) Image [Reference](https://vercel.com/docs/og-image-generation)
 - [ ] Image prefetching
 - [ ] Image preview [Reference](https://ui.aceternity.com/components/link-preview)
+- [ ] Build custom sign-in-or-up page
 - [ ] Improve the UX of the file view page
 - [ ] Implement mobile layout
 - [ ] Manage SVG sprites in React [Reference](https://kurtextrem.de/posts/svg-in-js)
