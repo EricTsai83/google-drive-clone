@@ -1,25 +1,16 @@
 import { verifyWebhook } from "@clerk/nextjs/webhooks";
-import { env } from "@/env";
 
-export async function POST(request: Request) {
-  console.log(env.CLERK_WEBHOOK_SIGNING_SECRET);
-  console.log(request);
+export async function POST(req: Request) {
   try {
-    const evt = await verifyWebhook(request);
+    const evt = await verifyWebhook(req);
 
-    // Access the event data
-    const { id } = evt.data;
-    const eventType = evt.type;
-
-    // Handle specific event types
     if (evt.type === "user.created") {
-      console.log("New user created:", evt.data.id);
-      // Handle user creation
+      console.log("userId:", evt.data.id);
     }
 
-    return new Response("Success", { status: 200 });
+    return new Response("Webhook received", { status: 200 });
   } catch (err) {
-    console.error("Webhook verification failed:", err);
-    return new Response("Webhook verification failed", { status: 400 });
+    console.error("Error verifying webhook:", err);
+    return new Response("Error verifying webhook", { status: 400 });
   }
 }
