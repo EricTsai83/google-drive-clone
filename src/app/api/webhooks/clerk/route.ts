@@ -3,6 +3,7 @@ import { env } from "@/env";
 
 export async function POST(request: Request) {
   console.log(env.CLERK_WEBHOOK_SIGNING_SECRET);
+  console.log(request);
   try {
     const evt = await verifyWebhook(request);
 
