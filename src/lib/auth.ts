@@ -85,20 +85,20 @@ export function hasPermission<Resource extends keyof Permissions>(
   });
 }
 
-// USAGE:
-const user: User = { blockedBy: ["2"], id: "1", roles: ["user"] };
-const folder: Folder = {
-  id: 1,
-  ownerId: "1",
-  name: "Test Folder",
-  type: "folder",
-  parent: null,
-  createdAt: new Date(),
-  lastModified: new Date(),
-};
+// // USAGE:
+// const user: User = { blockedBy: ["2"], id: "1", roles: ["user"] };
+// const folder: Folder = {
+//   id: 1,
+//   ownerId: "1",
+//   name: "Test Folder",
+//   type: "folder",
+//   parent: null,
+//   createdAt: new Date(),
+//   lastModified: new Date(),
+// };
 
-// Can upload a file
-hasPermission(user, "files", "uploadFile");
+// // Can upload a file
+// hasPermission(user, "files", "uploadFile");
 
-// Can view the folder
-hasPermission(user, "folders", "view", folder);
+// // Can view the folder
+// hasPermission(user, "folders", "view", folder);

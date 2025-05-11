@@ -30,11 +30,14 @@ export default async function ForderPage(props: {
   if (!userId || !sessionClaims || !currentFolderOwnerId) {
     unauthorized();
   }
+
   const user = {
     id: userId,
-    roles: sessionClaims.roles,
+    roles: sessionClaims.roles || ["user"], // Since webhooks are not processed in real-time, if a user's roles are undefined, the claim should fall back to ["user"].
     blockedBy: ["1"],
   };
+
+  console.log("======", user);
 
   hasPermission(user, "folders", "view", {
     id: parsedFolderId,
