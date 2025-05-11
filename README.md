@@ -55,4 +55,5 @@
 - [ ] Improve the UX of the file view page
 - [ ] Implement mobile layout
 - [ ] Manage SVG sprites in React [Reference](https://kurtextrem.de/posts/svg-in-js)
+- [ ] Fix the animation for the theme mode SVG button on the homepage
 - [ ] Simplify code
