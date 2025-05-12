@@ -4,7 +4,7 @@ import { createUploadthing, type FileRouter } from "uploadthing/next";
 import { UploadThingError } from "uploadthing/server";
 import { z } from "zod";
 import { fileUploadRatelimit } from "@/lib/ratelimit";
-
+import { hasPermission } from "@/lib/auth";
 const f = createUploadthing();
 
 // FileRouter for your app, can contain multiple FileRoutes
@@ -34,39 +34,45 @@ export const ourFileRouter = {
       // eslint-disable-next-line @typescript-eslint/only-throw-error
       if (!user.userId) throw new UploadThingError("Unauthorized");
 
-      // 檢查當前上傳的檔案數量
-      const uploadingFileCount = files.length;
+      const authCheckUser = {
+        roles: user.sessionClaims.roles || ["user"],
+        id: user.userId,
+      };
 
-      // 先檢查用戶的剩餘上傳限制，但不消耗配額
-      const { remaining, reset } = await fileUploadRatelimit.getRemaining(
-        user.userId,
+      const ignoreRateLimit = hasPermission(
+        authCheckUser,
+        "rateLimit",
+        "ignore",
       );
 
-      console.log("Current time (UTC):", new Date().toISOString());
-      console.log("Current time (Local):", new Date().toLocaleString());
-      console.log("Reset timestamp:", reset);
-      console.log("Reset time (UTC):", new Date(reset).toISOString());
-      console.log("Reset time (Local):", new Date(reset).toLocaleString());
-      console.log("uploadingFileCount", uploadingFileCount);
+      if (!ignoreRateLimit) {
+        // 檢查當前上傳的檔案數量
+        const uploadingFileCount = files.length;
 
-      // 如果要上傳的檔案數量超過剩餘限制，直接拒絕
-      if (uploadingFileCount > remaining) {
-        // eslint-disable-next-line @typescript-eslint/only-throw-error
-        throw new UploadThingError(
-          `Cannot upload ${uploadingFileCount} files. You can only upload ${remaining} more files today. Limit resets at ${new Date(reset).toLocaleString()}`,
+        // 先檢查用戶的剩餘上傳限制，但不消耗配額
+        const { remaining, reset } = await fileUploadRatelimit.getRemaining(
+          user.userId,
         );
-      }
 
-      // 確認可以上傳後，才實際消耗配額
-      const { success } = await fileUploadRatelimit.limit(user.userId, {
-        rate: uploadingFileCount,
-      });
+        // 如果要上傳的檔案數量超過剩餘限制，直接拒絕
+        if (uploadingFileCount > remaining) {
+          // eslint-disable-next-line @typescript-eslint/only-throw-error
+          throw new UploadThingError(
+            `Cannot upload ${uploadingFileCount} files. You can only upload ${remaining} more files today. Limit resets at ${new Date(reset).toLocaleString()}`,
+          );
+        }
 
-      if (!success) {
-        // eslint-disable-next-line @typescript-eslint/only-throw-error
-        throw new UploadThingError(
-          `Daily upload limit reached. You can upload ${remaining} more files today. Limit resets at ${new Date(reset).toLocaleString()}`,
-        );
+        // 確認可以上傳後，才實際消耗配額
+        const { success } = await fileUploadRatelimit.limit(user.userId, {
+          rate: uploadingFileCount,
+        });
+
+        if (!success) {
+          // eslint-disable-next-line @typescript-eslint/only-throw-error
+          throw new UploadThingError(
+            `Daily upload limit reached. You can upload ${remaining} more files today. Limit resets at ${new Date(reset).toLocaleString()}`,
+          );
+        }
       }
 
       const folder = await QUERIES.getFolderById(input.folderId);

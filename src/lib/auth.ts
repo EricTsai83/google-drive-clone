@@ -1,104 +1,80 @@
 // Attribute-Based Access Control
 // 基於屬性的存取控制
 // 根據使用者的屬性（例如角色、群組、權限等）來決定是否允許存取特定的資源
-import type { folders_table, files_table } from "@/server/db/schema";
-
-type File = typeof files_table.$inferSelect;
-type Folder = typeof folders_table.$inferSelect;
 
 type Role = "admin" | "user";
-type User = { blockedBy: string[]; roles: Role[]; id: string };
+type User = { roles: Role[]; id: string };
 
-type PermissionCheck<Key extends keyof Permissions> =
-  | boolean
-  | ((user: User, data: Permissions[Key]["dataType"]) => boolean);
+type Resource = "files" | "folders" | "rateLimit";
 
-type RolesWithPermissions = Record<
+type FileAction = "view" | "upload" | "download" | "rename" | "delete";
+type FolderAction = "view" | "create" | "delete" | "rename";
+type RateLimitAction = "ignore";
+type Action = FileAction | FolderAction | RateLimitAction;
+
+type PermissionCheck = boolean | ((user: User) => boolean);
+
+type ResourcePermissions = Partial<Record<Action, PermissionCheck>>;
+type RolePermissions = Record<
   Role,
-  Partial<{
-    [Key in keyof Permissions]: Partial<
-      Record<Permissions[Key]["action"], PermissionCheck<Key>>
-    >;
-  }>
+  Partial<Record<Resource, ResourcePermissions>>
 >;
 
-type Permissions = {
-  files: {
-    // Can do something like Pick<files, "id"> to get just the rows you use
-    dataType: Pick<File, "id" | "ownerId">;
-    action:
-      | "view"
-      | "uploadFile"
-      | "downloadFile"
-      | "renameFile"
-      | "deleteFile";
-  };
-  folders: {
-    dataType: Pick<Folder, "id" | "ownerId">;
-    action: "view" | "createFolder" | "deleteFolder";
-  };
-};
-
-const ROLES = {
+const ROLES: RolePermissions = {
   admin: {
     files: {
       view: true,
-      uploadFile: true,
-      downloadFile: true,
-      renameFile: true,
-      deleteFile: true,
+      upload: true,
+      download: true,
+      rename: true,
+      delete: true,
     },
     folders: {
       view: true,
-      createFolder: true,
-      deleteFolder: true,
+      create: true,
+      delete: true,
+      rename: true,
+    },
+    rateLimit: {
+      ignore: true,
     },
   },
   user: {
     files: {
-      view: true,
-      uploadFile: (user, file) => file.ownerId === user.id,
-      deleteFile: (user, file) => file.ownerId === user.id,
+      view: (_user) => true,
+      upload: (_user) => true,
+      download: (_user) => true,
+      rename: (_user) => true,
+      delete: (_user) => true,
     },
     folders: {
-      view: true,
-      createFolder: true,
-      deleteFolder: (user, folder) => folder.ownerId === user.id,
+      view: (_user) => true,
+      create: (_user) => true,
+      delete: (_user) => true,
+      rename: (_user) => true,
+    },
+    rateLimit: {
+      ignore: false,
     },
   },
-} as const satisfies RolesWithPermissions;
+};
 
-export function hasPermission<Resource extends keyof Permissions>(
+export function hasPermission(
   user: User,
   resource: Resource,
-  action: Permissions[Resource]["action"],
-  data?: Permissions[Resource]["dataType"],
-) {
+  action: Action,
+): boolean {
   return user.roles.some((role) => {
-    const permission = (ROLES as RolesWithPermissions)[role][resource]?.[
-      action
-    ];
-    if (permission == null) return false;
+    const permission = ROLES[role][resource]?.[action];
 
+    if (permission === undefined) return false;
     if (typeof permission === "boolean") return permission;
-    return data != null && permission(user, data);
+    if (typeof permission === "function") return permission(user);
+
+    return false;
   });
 }
 
-// // USAGE:
-// const user: User = { blockedBy: ["2"], id: "1", roles: ["user"] };
-// const folder: Folder = {
-//   id: 1,
-//   ownerId: "1",
-//   name: "Test Folder",
-//   type: "folder",
-//   parent: null,
-//   createdAt: new Date(),
-//   lastModified: new Date(),
-// };
-
-// // Can upload a file
-// hasPermission(user, "files", "uploadFile");
-
-// // Can view the folder
-// hasPermission(user, "folders", "view", folder);
+// Usage examples:
+// hasPermission({ roles: ["admin"], id: "1" }, "rateLimit", "ignore") // returns true
+// hasPermission({ roles: ["user"], id: "1" }, "rateLimit", "ignore") // returns false

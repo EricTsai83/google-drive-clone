@@ -40,8 +40,8 @@
 - [x] Add infinite scroll using Cursor-based pagination and trpc
 - [x] Implement upload rate limiting
 - [x] Set up a webhook with ngrok for Clerk
-- [ ] Implement attribute-based access control (ABAC)
-- [ ] Implement all authentication stuff, including the per-user upload limit
+- [x] Implement per-user upload limit
+- [x] Implement attribute-based access control (ABAC) to allow admin users to bypass the upload limit
 - [ ] Refactor the async code using the tryCatch utility function
 - [ ] Improve the error handling stuff
 - [ ] Block some extensions like .exe, .sh, etc.
