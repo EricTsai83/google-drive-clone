@@ -72,10 +72,6 @@ export const QUERIES = {
       `,
     );
 
-    if (parents.length === 0) {
-      throw new Error("folder not found");
-    }
-
     return parents;
   },
   getFolderById: async function (folderId: number) {

@@ -2,7 +2,7 @@ import Link from "next/link";
 import { unauthorized } from "next/navigation";
 import { QUERIES } from "@/server/db/queries";
 import { ChevronRight } from "lucide-react";
-
+import { tryCatch } from "@/lib/try-catch";
 interface Folder {
   id: number;
   name: string;
@@ -19,7 +19,15 @@ async function getValidatedParents(
   folderId: number,
   currentFolderOwnerId: string,
 ): Promise<Folder[]> {
-  const parents = await QUERIES.getAllParentsForFolder(folderId);
+  const { data: parents, error } = await tryCatch(
+    QUERIES.getAllParentsForFolder(folderId),
+  );
+
+  if (error) {
+    console.error("Database error while fetching parent folders:", error);
+    throw new Error("無法載入資料夾資訊，請稍後再試");
+  }
+
   const hasInvalidParent = parents.some(
     (parent: Folder) => parent.ownerId !== currentFolderOwnerId,
   );
