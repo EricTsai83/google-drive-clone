@@ -14,18 +14,18 @@ interface BreadcrumbNavProps {
   currentFolderOwnerId: string;
 }
 
-// 此函式負責取得所有父資料夾並驗證 owner
-async function getValidatedParents(
-  folderId: number,
-  currentFolderOwnerId: string,
-): Promise<Folder[]> {
+export async function BreadcrumbNav({
+  folderId,
+  currentFolderOwnerId,
+}: BreadcrumbNavProps) {
   const { data: parents, error } = await tryCatch(
     QUERIES.getAllParentsForFolder(folderId),
   );
 
   if (error) {
-    console.error("Database error while fetching parent folders:", error);
-    throw new Error("無法載入資料夾資訊，請稍後再試");
+    throw new Error(
+      "Connection error. We’re working on it. Please try again later.",
+    );
   }
 
   const hasInvalidParent = parents.some(
@@ -34,14 +34,6 @@ async function getValidatedParents(
   if (hasInvalidParent) {
     unauthorized();
   }
-  return parents;
-}
-
-export async function BreadcrumbNav({
-  folderId,
-  currentFolderOwnerId,
-}: BreadcrumbNavProps) {
-  const parents = await getValidatedParents(folderId, currentFolderOwnerId);
 
   return (
     <nav className="flex items-center">

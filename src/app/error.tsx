@@ -16,7 +16,7 @@ export default function Error({
   }, [error]);
 
   return (
-    <div className="flex h-full w-full items-center justify-center">
+    <div className="flex h-screen w-full items-center justify-center">
       <div className="flex min-h-[400px] flex-col items-center justify-center p-8">
         <div className="flex flex-col items-center space-y-6 text-center">
           <div className="relative">
@@ -29,7 +29,7 @@ export default function Error({
 
           <div className="space-y-2">
             <h2 className="text-2xl font-semibold tracking-tight">
-              Something went wrong!
+              {error.message}
             </h2>
             <p className="text-muted-foreground max-w-[500px]">
               We apologize for the inconvenience. An unexpected error occurred
