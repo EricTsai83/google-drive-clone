@@ -11,7 +11,8 @@ import { MoreHorizontal, Trash2Icon } from "lucide-react";
 import { toast } from "sonner";
 import { RenameDialog } from "@/app/f/[folderId]/_components/rename-dialog";
 import { api } from "@/trpc/react";
-
+import { tryCatch } from "@/lib/try-catch";
+import { DatabaseError, InternalServerError } from "@/lib/exceptions";
 export type ActionDropdownMenuProps = {
   id: number;
   name: string;
@@ -42,14 +43,39 @@ export function ActionDropdownMenu({
           onClick={async () => {
             setIsDeleting(true);
             try {
-              await deleteAction(id);
-              await utils.folder.getFolderContents.invalidate();
+              const { error: deleteError } = await tryCatch(deleteAction(id));
+
+              if (deleteError) {
+                throw new DatabaseError(
+                  `Failed to delete ${type}: ${deleteError.message}`,
+                );
+              }
+
+              const { error: invalidateError } = await tryCatch(
+                utils.folder.getFolderContents.invalidate(),
+              );
+
+              if (invalidateError) {
+                throw new InternalServerError(
+                  `Failed to invalidate folder contents: ${invalidateError.message}`,
+                );
+              }
+
               toast.success(`${actionLabel} deleted successfully`);
             } catch (error) {
               setIsDeleting(false);
-              toast.error(
-                `Failed to delete ${type}: ${error instanceof Error ? error.message : "Unknown error"}`,
-              );
+              if (
+                error instanceof DatabaseError ||
+                error instanceof InternalServerError
+              ) {
+                toast.error(error.message);
+              } else {
+                toast.error(
+                  `Failed to delete ${type}: ${
+                    error instanceof Error ? error.message : "Unknown error"
+                  }`,
+                );
+              }
             }
           }}
           aria-label={`Delete ${actionLabel}`}

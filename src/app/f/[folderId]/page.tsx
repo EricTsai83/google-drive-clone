@@ -6,6 +6,8 @@ import { unauthorized } from "next/navigation";
 import { BreadcrumbNav } from "./breadcrumb-nav";
 import { BreadcrumbNavSkeleton } from "./_components/skeletons/breadcrumb-nav-skeleton";
 import { Suspense } from "react";
+import { tryCatch } from "@/lib/try-catch";
+import { DatabaseError } from "@/lib/exceptions";
 
 export default async function ForderPage(props: {
   params: Promise<{ folderId: string }>;
@@ -22,8 +24,15 @@ export default async function ForderPage(props: {
 
   const parsedFolderId = data.folderId;
 
-  // 取得該資料夾的 ownerId
-  const currentFolderOwnerId = await QUERIES.getFolderOwner(parsedFolderId);
+  // // 取得該資料夾的 ownerId
+  const { data: currentFolderOwnerId, error } = await tryCatch(
+    QUERIES.getFolderOwner(parsedFolderId),
+  );
+
+  if (error) {
+    throw new DatabaseError();
+  }
+
   const { userId } = await auth();
 
   if (!userId || !currentFolderOwnerId || userId !== currentFolderOwnerId) {

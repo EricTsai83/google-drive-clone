@@ -102,7 +102,7 @@ export const ourFileRouter = {
       console.log("Upload complete for userId:", metadata.userId);
       console.log("file url", file.ufsUrl);
 
-      const { data, error } = await tryCatch(
+      const { error } = await tryCatch(
         MUTATIONS.createFile({
           file: {
             utFileKey: file.key,
@@ -120,27 +120,6 @@ export const ourFileRouter = {
           `Failed to save file "${file.name}" metadata to database. Please try uploading again.`,
         );
       }
-
-      // try {
-      //   await MUTATIONS.createFile({
-      //     file: {
-      //       utFileKey: file.key,
-      //       name: file.name,
-      //       size: file.size,
-      //       url: file.ufsUrl,
-      //       parent: metadata.parentId,
-      //     },
-      //     userId: metadata.userId,
-      //   });
-
-      //   // !!! Whatever is returned here is sent to the clientside `onClientUploadComplete` callback
-      //   return { uploadedBy: metadata.userId };
-      // } catch (error) {
-      //   console.error("Error saving file to database:", error);
-      //   throw new FileUploadError(
-      //     `Failed to save file "${file.name}" metadata to database. Please try uploading again.`,
-      //   );
-      // }
     }),
 } satisfies FileRouter;
 
