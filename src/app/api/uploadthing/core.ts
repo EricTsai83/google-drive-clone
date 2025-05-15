@@ -5,6 +5,9 @@ import { UploadThingError } from "uploadthing/server";
 import { z } from "zod";
 import { fileUploadRatelimit } from "@/lib/ratelimit";
 import { hasPermission } from "@/lib/auth";
+import { tryCatch } from "@/lib/try-catch";
+import { DatabaseError, FileUploadError } from "@/lib/exceptions";
+
 const f = createUploadthing();
 
 // FileRouter for your app, can contain multiple FileRoutes
@@ -75,7 +78,13 @@ export const ourFileRouter = {
         }
       }
 
-      const folder = await QUERIES.getFolderById(input.folderId);
+      const { data: folder, error } = await tryCatch(
+        QUERIES.getFolderById(input.folderId),
+      );
+
+      if (error) {
+        throw new DatabaseError();
+      }
 
       // eslint-disable-next-line @typescript-eslint/only-throw-error
       if (!folder) throw new UploadThingError("Folder not found");
@@ -92,8 +101,9 @@ export const ourFileRouter = {
       // This code RUNS ON YOUR SERVER after upload
       console.log("Upload complete for userId:", metadata.userId);
       console.log("file url", file.ufsUrl);
-      try {
-        await MUTATIONS.createFile({
+
+      const { data, error } = await tryCatch(
+        MUTATIONS.createFile({
           file: {
             utFileKey: file.key,
             name: file.name,
@@ -102,14 +112,35 @@ export const ourFileRouter = {
             parent: metadata.parentId,
           },
           userId: metadata.userId,
-        });
+        }),
+      );
 
-        // !!! Whatever is returned here is sent to the clientside `onClientUploadComplete` callback
-        return { uploadedBy: metadata.userId };
-      } catch (error) {
-        console.error("Error saving file to database:", error);
-        throw new Error("Error saving file to database");
+      if (error) {
+        throw new FileUploadError(
+          `Failed to save file "${file.name}" metadata to database. Please try uploading again.`,
+        );
       }
+
+      // try {
+      //   await MUTATIONS.createFile({
+      //     file: {
+      //       utFileKey: file.key,
+      //       name: file.name,
+      //       size: file.size,
+      //       url: file.ufsUrl,
+      //       parent: metadata.parentId,
+      //     },
+      //     userId: metadata.userId,
+      //   });
+
+      //   // !!! Whatever is returned here is sent to the clientside `onClientUploadComplete` callback
+      //   return { uploadedBy: metadata.userId };
+      // } catch (error) {
+      //   console.error("Error saving file to database:", error);
+      //   throw new FileUploadError(
+      //     `Failed to save file "${file.name}" metadata to database. Please try uploading again.`,
+      //   );
+      // }
     }),
 } satisfies FileRouter;
 

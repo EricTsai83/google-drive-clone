@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { MUTATIONS, QUERIES } from "@/server/db/queries";
 import { tryCatch } from "@/lib/try-catch";
+import { DatabaseError } from "@/lib/exceptions";
 
 export default async function DrivePage() {
   const session = await auth();
@@ -16,9 +17,7 @@ export default async function DrivePage() {
   );
 
   if (error) {
-    throw new Error(
-      "Connection error. We’re working on it. Please try again later.",
-    );
+    throw new DatabaseError();
   }
 
   // first time onboarding
@@ -38,9 +37,7 @@ export default async function DrivePage() {
           );
 
           if (error) {
-            throw new Error(
-              "Connection error. We’re working on it. Please try again later.",
-            );
+            throw new DatabaseError();
           }
 
           return redirect(`/f/${rootFolderId}`);
