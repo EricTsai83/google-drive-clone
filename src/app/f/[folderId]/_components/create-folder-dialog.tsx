@@ -15,6 +15,8 @@ import { Plus } from "lucide-react";
 import { toast } from "sonner";
 import { useState } from "react";
 import { api } from "@/trpc/react";
+import { tryCatch } from "@/lib/try-catch";
+import { DatabaseError, InternalServerError } from "@/lib/exceptions";
 
 export function CreateFolderDialog({
   currentFolderId,
@@ -31,19 +33,29 @@ export function CreateFolderDialog({
       return;
     }
     setIsOpen(false);
-    try {
-      const response = await createFolder(name, currentFolderId);
-      if (response.error) {
-        toast.error(response.error);
-        return;
-      }
-      await utils.folder.getFolderContents.invalidate();
-      toast.success("Folder created successfully");
-    } catch (error) {
-      toast.error(
-        `Failed to create folder: ${error instanceof Error ? error.message : "Unknown error"}`,
+
+    const { data: createFolderResponse, error: createFolderError } =
+      await tryCatch(createFolder(name, currentFolderId));
+    if (createFolderError) {
+      throw new DatabaseError(
+        `Failed to create folder: ${createFolderError.message}`,
       );
     }
+
+    if (createFolderResponse.error) {
+      toast.error(createFolderResponse.error);
+      return;
+    }
+
+    const { error: invalidateError } = await tryCatch(
+      utils.folder.getFolderContents.invalidate(),
+    );
+    if (invalidateError) {
+      throw new InternalServerError(
+        `Failed to invalidate folder contents: ${invalidateError.message}`,
+      );
+    }
+    toast.success("Folder created successfully");
   }
 
   return (

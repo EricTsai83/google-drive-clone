@@ -21,11 +21,11 @@ export default async function PhotoModal(props: {
 
   const parsedImageId = data.imageId;
 
-  const { data: currentFileOwnerId, error } = await tryCatch(
+  const { data: currentFileOwnerId, error: getFileOwnerError } = await tryCatch(
     QUERIES.getFileOwner(parsedImageId),
   );
 
-  if (error) {
+  if (getFileOwnerError) {
     throw new DatabaseError();
   }
 
@@ -35,17 +35,17 @@ export default async function PhotoModal(props: {
     unauthorized();
   }
 
-  const { data: image, error: imageError } = await tryCatch(
+  const { data: file, error: getFileError } = await tryCatch(
     QUERIES.getFile(parsedImageId),
   );
 
-  if (imageError) {
+  if (getFileError) {
     throw new DatabaseError();
   }
 
   return (
     <Modal>
-      <FullPageImageView image={image ?? null} />
+      <FullPageImageView image={file ?? null} />
     </Modal>
   );
 }

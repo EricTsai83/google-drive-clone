@@ -54,7 +54,9 @@
 - [ ] Image preview [Reference](https://ui.aceternity.com/components/link-preview)
 - [ ] Build custom sign-in-or-up page
 - [ ] Improve the UX of the file view page
+- [ ] Improve error messages [Reference](https://wix-ux.com/when-life-gives-you-lemons-write-better-error-messages-46c5223e1a2f)
 - [ ] Implement mobile layout
 - [ ] Manage SVG sprites in React [Reference](https://kurtextrem.de/posts/svg-in-js)
 - [ ] Fix the animation for the theme mode SVG button on the homepage
 - [ ] Simplify code
+- [ ] Add hcaptcha [Reference](https://www.hcaptcha.com)
