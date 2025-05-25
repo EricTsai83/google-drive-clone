@@ -60,3 +60,5 @@
 - [ ] Fix the animation for the theme mode SVG button on the homepage
 - [ ] Simplify code
 - [ ] Add hcaptcha [Reference](https://www.hcaptcha.com)
+- [ ] Use [Effect](https://effect.website/docs/getting-started/why-effect/) to create a service that automatically deletes all files from the database and the UploadThing server one day after a normal user uploads them
+- [ ] Use [imagekit](https://imagekit.io/) to remove backgrounds, enhance low-resolution images, and generate AI-based tags
