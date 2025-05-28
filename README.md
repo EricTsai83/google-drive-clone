@@ -62,3 +62,4 @@
 - [ ] Add hcaptcha [Reference](https://www.hcaptcha.com)
 - [ ] Use [Effect](https://effect.website/docs/getting-started/why-effect/) to create a service that automatically deletes all files from the database and the UploadThing server one day after a normal user uploads them
 - [ ] Use [imagekit](https://imagekit.io/) to remove backgrounds, enhance low-resolution images, and generate AI-based tags
+- [ ] Use Vercel's [List deployments API service](https://vercel.com/docs/rest-api/reference/endpoints/deployments/list-deployments)  to display a notification toast that prompts the current user to refresh the page after a new deployment is made
